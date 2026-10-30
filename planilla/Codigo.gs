@@ -7,8 +7,14 @@
 // llega el mismo código y acá se reemplaza su fila en vez de duplicarla.
 
 const HOJA = 'Confirmaciones';
+const HOJA_LOG = 'Log';
+const HOJA_RESUMEN = 'Resumen';
 const BODA = 'nati-y-mati';
 const COLUMNAS = ['Fecha', 'Código', 'Asiste', 'Nombre', 'Bebidas', 'Comida', 'Comida (otra)', 'Canción', 'Mensaje', 'Actualizado'];
+// Lo que la invitación puede mandar: cualquier otra cosa se descarta o se recorta
+const BEBIDAS = ['Fernet', 'Gin tonic', 'Cerveza', 'Champagne', 'Aperol', 'Whiskey', 'Sin alcohol'];
+const COMIDAS = ['Ninguna', 'Vegetariano', 'Vegano', 'Sin TACC', 'Otra'];
+const LARGO = { id: 40, nombre: 80, comidaOtra: 200, cancion: 200, mensaje: 1000 };
 
 // El cerrojo es imprescindible: sin él, con muchos pedidos a la vez las filas se pisan (probado el 30/10/2026: de
 // 79 pedidos que respondieron "ok" quedaron 17 filas). Cada pedido espera su turno hasta 60 s; Google además
@@ -17,20 +23,23 @@ function doPost(e) {
   const cerrojo = LockService.getScriptLock();
   cerrojo.waitLock(60000);
   try {
-    const datos = JSON.parse(e.postData.contents);
-    if (datos.boda !== BODA) return respuesta({ ok: false, error: 'boda desconocida' });
+    const crudo = e.postData.contents;
+    const datos = validar(JSON.parse(crudo));
+    if (!datos) return respuesta({ ok: false, error: 'datos inválidos' });
+    // Primero el Log, crudo y sin editar nunca: es el historial y el respaldo de la hoja principal
+    anotarLog(crudo, datos.id);
     const hoja = obtenerHoja();
     const ahora = new Date();
     const fila = [
       ahora,
-      String(datos.id || ''),
+      datos.id,
       datos.asiste === 'no' ? 'No va' : 'Sí',
-      String(datos.nombre || '').trim(),
-      (datos.bebidas || []).join(', '),
-      (datos.comida || []).join(', '),
-      String(datos.comidaOtra || '').trim(),
-      String(datos.cancion || '').trim(),
-      String(datos.mensaje || '').trim(),
+      datos.nombre,
+      datos.bebidas.join(', '),
+      datos.comida.join(', '),
+      datos.comidaOtra,
+      datos.cancion,
+      datos.mensaje,
       ahora
     ];
     const existente = buscarFila(hoja, fila[1]);
@@ -43,10 +52,86 @@ function doPost(e) {
     }
     return respuesta({ ok: true, fila: existente || hoja.getLastRow() });
   } catch (err) {
+    avisarError(err, e && e.postData && e.postData.contents);
     return respuesta({ ok: false, error: String(err) });
   } finally {
     cerrojo.releaseLock();
   }
+}
+
+// Devuelve los datos limpios (recortados a los largos máximos, con solo las opciones conocidas) o null si no
+// sirven: boda distinta, sin código, sin nombre o con una respuesta que no es "si"/"no"
+function validar(d) {
+  if (!d || d.boda !== BODA) return null;
+  const texto = function (v, max) { return String(v == null ? '' : v).trim().slice(0, max); };
+  const lista = function (v, permitidos) { return (Array.isArray(v) ? v : []).map(String).filter(function (x) { return permitidos.indexOf(x) !== -1; }); };
+  const limpio = {
+    id: texto(d.id, LARGO.id),
+    asiste: d.asiste === 'no' ? 'no' : d.asiste === 'si' ? 'si' : '',
+    nombre: texto(d.nombre, LARGO.nombre),
+    bebidas: lista(d.bebidas, BEBIDAS),
+    comida: lista(d.comida, COMIDAS),
+    comidaOtra: texto(d.comidaOtra, LARGO.comidaOtra),
+    cancion: texto(d.cancion, LARGO.cancion),
+    mensaje: texto(d.mensaje, LARGO.mensaje)
+  };
+  if (!limpio.id || !limpio.asiste || limpio.nombre.length < 2) return null;
+  return limpio;
+}
+
+function anotarLog(crudo, id) {
+  const libro = SpreadsheetApp.getActiveSpreadsheet();
+  let log = libro.getSheetByName(HOJA_LOG);
+  if (!log) {
+    log = libro.insertSheet(HOJA_LOG);
+    log.appendRow(['Fecha', 'Código', 'Datos tal cual llegaron']);
+    log.setFrozenRows(1);
+    log.getRange(1, 1, 1, 3).setFontWeight('bold');
+  }
+  log.appendRow([new Date(), id, crudo.slice(0, 5000)]);
+}
+
+// Si algo falla, un mail al dueño de la planilla con el error y lo que había llegado (como mucho uno por minuto
+// para no inundar la casilla si el problema se repite)
+function avisarError(err, crudo) {
+  try {
+    const cache = CacheService.getScriptCache();
+    if (cache.get('aviso-error')) return;
+    cache.put('aviso-error', '1', 60);
+    MailApp.sendEmail(Session.getEffectiveUser().getEmail(), 'Invitación: falló una confirmación',
+      'Error: ' + String(err) + (err && err.stack ? '\n\n' + err.stack : '') + '\n\nDatos recibidos:\n' + String(crudo || '(sin datos)'));
+  } catch (e2) {}
+}
+
+// Pestaña "Resumen" con fórmulas sobre la hoja Confirmaciones: cuántos van, cuántos no, restricciones y bebidas.
+// Ejecutar una vez desde el editor; si ya existe, se rehace.
+function prepararResumen() {
+  const libro = SpreadsheetApp.getActiveSpreadsheet();
+  let hoja = libro.getSheetByName(HOJA_RESUMEN);
+  if (hoja) hoja.clear(); else hoja = libro.insertSheet(HOJA_RESUMEN);
+  const C = "'" + HOJA + "'!";
+  const filas = [
+    ['Respuestas', '=MAX(0,COUNTA(' + C + 'B:B)-1)'],
+    ['Van', '=COUNTIF(' + C + 'C:C,"Sí")'],
+    ['No van', '=COUNTIF(' + C + 'C:C,"No va")'],
+    [],
+    ['Comida (de los que van)', ''],
+    ['Vegetarianos', '=COUNTIFS(' + C + 'C:C,"Sí",' + C + 'F:F,"*Vegetariano*")'],
+    ['Veganos', '=COUNTIFS(' + C + 'C:C,"Sí",' + C + 'F:F,"*Vegano*")'],
+    ['Sin TACC', '=COUNTIFS(' + C + 'C:C,"Sí",' + C + 'F:F,"*Sin TACC*")'],
+    ['Otra restricción', '=COUNTIFS(' + C + 'C:C,"Sí",' + C + 'F:F,"*Otra*")'],
+    ['Sin restricciones', '=COUNTIFS(' + C + 'C:C,"Sí",' + C + 'F:F,"Ninguna")'],
+    [],
+    ['Bebidas (de los que van)', '']
+  ].concat(BEBIDAS.map(function (b) { return [b, '=COUNTIFS(' + C + 'C:C,"Sí",' + C + 'E:E,"*' + b + '*")']; }));
+  filas.forEach(function (f, i) {
+    if (!f.length) return;
+    hoja.getRange(i + 1, 1).setValue(f[0]);
+    if (f[1]) hoja.getRange(i + 1, 2).setFormula(f[1]);
+    if (!f[1]) hoja.getRange(i + 1, 1).setFontWeight('bold');
+  });
+  hoja.getRange(1, 1, 3, 1).setFontWeight('bold');
+  hoja.setColumnWidth(1, 220);
 }
 
 // Abrir la dirección de la aplicación web en el navegador muestra esto: sirve para ver que está viva
@@ -118,6 +203,15 @@ function borrarPruebas() {
     if (vacia || codigo.indexOf('prueba-') === 0 || /^prueba\b/i.test(nombre.trim())) { hoja.deleteRow(i + 2); borradas++; }
   }
   Logger.log('Filas borradas (de prueba o vacías): ' + borradas);
+  // En el Log, las mismas pruebas (por código)
+  const log = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HOJA_LOG);
+  if (!log || log.getLastRow() < 2) return;
+  const codigosLog = log.getRange(2, 2, log.getLastRow() - 1, 1).getValues();
+  let borradasLog = 0;
+  for (let j = codigosLog.length - 1; j >= 0; j--) {
+    if (String(codigosLog[j][0]).indexOf('prueba-') === 0) { log.deleteRow(j + 2); borradasLog++; }
+  }
+  Logger.log('Filas de prueba borradas del Log: ' + borradasLog);
 }
 
 // Para probar desde el editor (Ejecutar ▶ con esta función elegida): anota una confirmación de ejemplo.
