@@ -927,14 +927,12 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   .abierta .navegacion { opacity: 1; pointer-events: auto; }
   .navegacion a { color: var(--tinta-suave); text-decoration: none; transition: color .25s ease; }
   .navegacion a:hover { color: var(--tinta); }
+  /* En el medio, el sello de lacre del sobre (se copia de ahí al cargar); si no hay JavaScript queda el monograma */
   .navegacion-mono {
     box-sizing: border-box;
-    width: 64px;
-    height: 64px;
-    margin: 0 8px;
-    border: 1px solid var(--tinta);
-    border-radius: 50%;
-    /* flex y no grid: con grid, la "N", el "&" y la "M" quedaban como tres celdas apiladas */
+    width: 66px;
+    height: 66px;
+    margin: 0 10px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -943,10 +941,10 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     font-size: 23px;
     line-height: 1;
     white-space: nowrap;
-    padding-top: 5px;
     color: var(--tinta) !important;
   }
   .navegacion-mono .amp { color: #A8A955; font-size: 19px; margin: 0 1px; }
+  .navegacion-mono svg { width: 66px; height: 66px; overflow: visible; display: block; }
   /* Al ir a una parte desde la barra, el título no queda tapado por la barra */
   #ceremonia, #fiesta, #t-regalos, #t-lugares { scroll-margin-top: 110px; }
 
@@ -1609,6 +1607,19 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !aviso.hidden) cerrarAviso(); });
     try { $('#cerrar-aviso-chrome').focus({ preventScroll: true }); } catch (e) {}
   }
+
+  // ---- Barra de laptop ----
+  // En el medio va el sello de lacre de la tarjeta de confirmación, copiado con sus degradados y filtro renombrados
+  // para que los ids no se repitan en la página
+  (function () {
+    const original = $('.tarjeta-sello'), lugar = $('.navegacion-mono');
+    if (!original || !lugar) return;
+    const sello = original.cloneNode(true);
+    sello.removeAttribute('class');
+    sello.querySelectorAll('[id]').forEach(function (e) { e.id += '-nav'; });
+    sello.innerHTML = sello.innerHTML.replace(/url\(#([^)]+)\)/g, 'url(#$1-nav)');
+    lugar.replaceChildren(sello);
+  })();
 
   // ---- Sobre ----
   // Al abrir el sobre la invitación arranca siempre desde arriba, aunque el navegador haya guardado otra posición
