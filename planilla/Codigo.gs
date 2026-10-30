@@ -10,10 +10,12 @@ const HOJA = 'Confirmaciones';
 const BODA = 'nati-y-mati';
 const COLUMNAS = ['Fecha', 'Código', 'Asiste', 'Nombre', 'Bebidas', 'Comida', 'Comida (otra)', 'Canción', 'Mensaje', 'Actualizado'];
 
+// El cerrojo es imprescindible: sin él, con muchos pedidos a la vez las filas se pisan (probado el 30/10/2026: de
+// 79 pedidos que respondieron "ok" quedaron 17 filas). Cada pedido espera su turno hasta 60 s; Google además
+// atiende unas 30 ejecuciones a la vez y rechaza el resto, pero la invitación reintenta hasta recibir "ok".
 function doPost(e) {
-  // Un pedido a la vez: si varios invitados confirman en el mismo segundo, se anotan de a uno
   const cerrojo = LockService.getScriptLock();
-  cerrojo.waitLock(20000);
+  cerrojo.waitLock(60000);
   try {
     const datos = JSON.parse(e.postData.contents);
     if (datos.boda !== BODA) return respuesta({ ok: false, error: 'boda desconocida' });

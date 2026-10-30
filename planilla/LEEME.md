@@ -37,11 +37,16 @@ Detalles que conviene saber:
   en vez de agregar otra. Si confirma desde otro celular, aparece como fila nueva.
 - Abrir la dirección `/exec` en un navegador muestra un texto con la cantidad de confirmaciones: sirve para ver
   que la aplicación está viva.
-- Google atiende de a pocas confirmaciones a la vez: en una prueba de carga (29/10/2026), de 40 mandadas en el
-  mismo segundo entraron 18 y el resto volvió con error. Por eso la invitación reintenta sola con esperas
-  crecientes (2, 5, 10, 20 y 40 s) hasta que la planilla contesta `ok`, y si el invitado cierra la página antes,
-  lo vuelve a intentar la próxima vez que la abre. Con eso, en la misma prueba entraron las 40. Repetir es
-  seguro: el código del invitado hace que se reemplace su fila en vez de duplicarse. El invitado nunca ve un
-  error, y su respuesta igual llega por WhatsApp.
+- Muchas confirmaciones a la vez (pruebas de carga del 29 y 30/10/2026, 40 en el mismo segundo):
+  - El script anota de a una, con un cerrojo (`LockService`). Con una espera de 20 s, los pedidos que no
+    alcanzaban turno volvían con error y se perdían 22 de 40. Con la espera en **60 s** (versión 3 de la
+    aplicación web) entran las 40 al primer intento, en cola, en unos 40 s.
+  - **No sacar el cerrojo**: sin él las escrituras simultáneas se pisan (respondieron "ok" 79 pedidos y quedaron
+    17 filas).
+  - Además la invitación lee la respuesta y, si no recibe `ok`, reintenta con esperas de 2, 5, 10, 20 y 40 s;
+    si el invitado se va a WhatsApp o cierra la página con la anotación pendiente, la manda una última vez con
+    `sendBeacon` (sale aunque la página ya no esté) y, si vuelve a abrir la invitación, la reintenta. Repetir es
+    seguro: el código del invitado hace que se reemplace su fila en vez de duplicarse. El invitado nunca ve un
+    error, y su respuesta igual llega por WhatsApp.
 - `borrarPruebas` (desde el editor) borra las filas cuyo código empieza con `prueba-` (las de `probar` y las de
   las pruebas de carga).

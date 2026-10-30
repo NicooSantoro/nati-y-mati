@@ -1929,8 +1929,18 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
       bebidas: va ? estado.bebidas : [], comida: va ? estado.comida : [], comidaOtra: va ? estado.comidaOtra.trim() : '',
       cancion: va ? estado.cancion.trim() : '', mensaje: estado.mensaje.trim()
     };
+    ultimoEnvio = datos;
     mandarAPlanilla(datos, 0);
   }
+  // Si el invitado se va (a WhatsApp, o cierra la página) y la planilla todavía no contestó, se manda una última
+  // vez con sendBeacon: el navegador lo despacha aunque la página ya no esté (también en iPhone)
+  let ultimoEnvio = null;
+  function ultimoIntentoAlIrse() {
+    if (!ultimoEnvio || !estado.pendiente || estado.id !== ultimoEnvio.id || !navigator.sendBeacon) return;
+    try { navigator.sendBeacon(BODA.planilla, new Blob([JSON.stringify(ultimoEnvio)], { type: 'text/plain;charset=utf-8' })); } catch (e) {}
+  }
+  window.addEventListener('pagehide', ultimoIntentoAlIrse);
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') ultimoIntentoAlIrse(); });
   function mandarAPlanilla(datos, intento) {
     // Una respuesta nueva de la misma persona reemplaza a esta: no hace falta seguir insistiendo con la vieja
     if (estado.id !== datos.id || !estado.pendiente) return;
@@ -1981,6 +1991,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   }
   // Después de mandar por WhatsApp la tarjeta pasa a la despedida (la respuesta queda guardada por si se recarga)
   $('#enviar-wa').addEventListener('click', function () {
+    ultimoIntentoAlIrse();
     setTimeout(function () { ir('gracias', 1); }, 800);
   });
 
