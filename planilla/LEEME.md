@@ -37,5 +37,11 @@ Detalles que conviene saber:
   en vez de agregar otra. Si confirma desde otro celular, aparece como fila nueva.
 - Abrir la dirección `/exec` en un navegador muestra un texto con la cantidad de confirmaciones: sirve para ver
   que la aplicación está viva.
-- La invitación manda los datos sin esperar respuesta (así lo exige Google desde otra página); si alguna vez la
-  planilla no estuviera disponible, el invitado no ve ningún error y su respuesta igual llega por WhatsApp.
+- Google atiende de a pocas confirmaciones a la vez: en una prueba de carga (29/10/2026), de 40 mandadas en el
+  mismo segundo entraron 18 y el resto volvió con error. Por eso la invitación reintenta sola con esperas
+  crecientes (2, 5, 10, 20 y 40 s) hasta que la planilla contesta `ok`, y si el invitado cierra la página antes,
+  lo vuelve a intentar la próxima vez que la abre. Con eso, en la misma prueba entraron las 40. Repetir es
+  seguro: el código del invitado hace que se reemplace su fila en vez de duplicarse. El invitado nunca ve un
+  error, y su respuesta igual llega por WhatsApp.
+- `borrarPruebas` (desde el editor) borra las filas cuyo código empieza con `prueba-` (las de `probar` y las de
+  las pruebas de carga).

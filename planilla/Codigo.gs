@@ -102,6 +102,19 @@ function respuesta(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 
+// Borra las filas de prueba (las que tienen un código que empieza con "prueba-"), de abajo hacia arriba
+function borrarPruebas() {
+  const hoja = obtenerHoja();
+  const ultima = hoja.getLastRow();
+  if (ultima < 2) return;
+  const codigos = hoja.getRange(2, 2, ultima - 1, 1).getValues();
+  let borradas = 0;
+  for (let i = codigos.length - 1; i >= 0; i--) {
+    if (String(codigos[i][0]).indexOf('prueba-') === 0) { hoja.deleteRow(i + 2); borradas++; }
+  }
+  Logger.log('Filas de prueba borradas: ' + borradas);
+}
+
 // Para probar desde el editor (Ejecutar ▶ con esta función elegida): anota una confirmación de ejemplo.
 // La primera vez Google pide autorizar el acceso a la planilla; es normal.
 function probar() {

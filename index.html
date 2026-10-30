@@ -1266,7 +1266,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   // Se muestra en el diagnóstico (?debug) para saber qué versión cargó el teléfono
-  const VERSION = '38';
+  const VERSION = '39';
 
   // ---- Pétalos en acuarela ----
   // Los de fondo están pegados a la pantalla, arriba de todo, y siguen cayendo mientras se baja. Son elementos con
@@ -1793,24 +1793,12 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     });
   });
 
-  function comidaTexto() {
-    const lista = estado.comida.filter(function (c) { return c !== 'Otra'; });
-    if (estado.comida.indexOf('Otra') !== -1 && estado.comidaOtra.trim()) lista.push(estado.comidaOtra.trim());
-    return lista.length ? lista.join(', ') : 'Sin restricciones';
-  }
+  // El mensaje de WhatsApp solo dice si va o no: el resto (bebidas, comida, canción, mensaje) queda en la planilla
   function mensajeWa() {
     const n = estado.nombre.trim();
-    if (estado.asiste === 'no') {
-      return ['¡Hola! Soy ' + n + '.', 'Lamentablemente no voy a poder ir al casamiento de ' + BODA.novios + '.', estado.mensaje.trim() ? 'Mensaje: ' + estado.mensaje.trim() : '']
-        .filter(Boolean).join('\n');
-    }
-    return [
-      '¡Hola! Soy ' + n + ' y confirmo que voy al casamiento de ' + BODA.novios + '.',
-      'Para tomar: ' + (estado.bebidas.length ? estado.bebidas.join(', ') : 'ninguna en particular'),
-      'Comida: ' + comidaTexto(),
-      estado.cancion.trim() ? 'Canción que no puede faltar: ' + estado.cancion.trim() : '',
-      estado.mensaje.trim() ? 'Mensaje: ' + estado.mensaje.trim() : ''
-    ].filter(Boolean).join('\n');
+    return estado.asiste === 'no'
+      ? '¡Hola Nati y Mati! Soy ' + n + '. Lamentablemente no voy a poder estar el 18 de diciembre, pero les mando un abrazo enorme y les deseo lo mejor en este comienzo.'
+      : '¡Hola Nati y Mati! Soy ' + n + ' y ya confirmé: ¡voy al casamiento! 🥂\n\nNos vemos el 18 de diciembre.';
   }
   function armarEnvio() {
     const sepan = estado.asiste === 'no' ? 'para que sepan que no vas a poder' : 'para que sepan que vas';
@@ -1926,17 +1914,40 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 
   // Cada confirmación se anota también en la planilla de los novios. Si la misma persona vuelve a confirmar
   // desde este celular, lleva el mismo código y la planilla reemplaza su respuesta en vez de duplicarla.
+  // Google atiende de a pocas confirmaciones a la vez: si muchas llegan en el mismo segundo, algunas vuelven con
+  // error. Por eso se reintenta con esperas crecientes (es seguro: el mismo código reemplaza la fila, no la duplica)
+  // y, si la página se cierra antes de que la planilla conteste, queda marcada como pendiente para la próxima visita
+  const ESPERAS_PLANILLA = [2000, 5000, 10000, 20000, 40000];
   function anotarEnPlanilla() {
     if (!BODA.planilla || !window.fetch) return;
-    if (!estado.id) { estado.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8); guardar(); }
+    if (!estado.id) { estado.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+    estado.pendiente = true;
+    guardar();
     const va = estado.asiste !== 'no';
     const datos = {
       boda: 'nati-y-mati', id: estado.id, asiste: estado.asiste, nombre: estado.nombre.trim(),
       bebidas: va ? estado.bebidas : [], comida: va ? estado.comida : [], comidaOtra: va ? estado.comidaOtra.trim() : '',
       cancion: va ? estado.cancion.trim() : '', mensaje: estado.mensaje.trim()
     };
-    // Google no deja leer la respuesta desde otra página; alcanza con que el pedido llegue
-    fetch(BODA.planilla, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(datos) }).catch(function () {});
+    mandarAPlanilla(datos, 0);
+  }
+  function mandarAPlanilla(datos, intento) {
+    // Una respuesta nueva de la misma persona reemplaza a esta: no hace falta seguir insistiendo con la vieja
+    if (estado.id !== datos.id || !estado.pendiente) return;
+    const cuerpo = JSON.stringify(datos);
+    // keepalive: el primer envío sale aunque el invitado cierre la página enseguida (por ejemplo al irse a WhatsApp)
+    fetch(BODA.planilla, { method: 'POST', keepalive: intento === 0, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: cuerpo })
+      .then(function (r) { return r.text(); })
+      .then(function (texto) {
+        let respuesta = null;
+        try { respuesta = JSON.parse(texto); } catch (e) {}
+        if (!respuesta || !respuesta.ok) throw new Error('la planilla no anotó');
+        if (estado.id === datos.id) { estado.pendiente = false; guardar(); }
+      })
+      .catch(function () {
+        if (intento >= ESPERAS_PLANILLA.length) return;
+        setTimeout(function () { mandarAPlanilla(datos, intento + 1); }, ESPERAS_PLANILLA[intento] + Math.random() * 1000);
+      });
   }
 
   function siguiente() {
@@ -2000,6 +2011,8 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 
   aplicarModo();
   ir(actual, 0);
+  // Si la última confirmación quedó sin anotar en la planilla (se cerró la página antes de que contestara), se vuelve a mandar
+  if (estado.pendiente && estado.id && estado.asiste) anotarEnPlanilla();
 
   // ---- Diagnóstico: con ?debug en la dirección muestra qué hace el audio en este teléfono ----
   if (/[?&]debug/.test(location.search)) {
