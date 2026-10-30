@@ -102,17 +102,20 @@ function respuesta(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 
-// Borra las filas de prueba (las que tienen un código que empieza con "prueba-"), de abajo hacia arriba
+// Borra las filas de prueba (código que empieza con "prueba-" o nombre que empieza con "Prueba") y las filas
+// que quedaron vacías en el medio (por ejemplo si se borró el contenido en vez de la fila), de abajo hacia arriba
 function borrarPruebas() {
   const hoja = obtenerHoja();
   const ultima = hoja.getLastRow();
   if (ultima < 2) return;
-  const codigos = hoja.getRange(2, 2, ultima - 1, 1).getValues();
+  const filas = hoja.getRange(2, 1, ultima - 1, COLUMNAS.length).getValues();
   let borradas = 0;
-  for (let i = codigos.length - 1; i >= 0; i--) {
-    if (String(codigos[i][0]).indexOf('prueba-') === 0) { hoja.deleteRow(i + 2); borradas++; }
+  for (let i = filas.length - 1; i >= 0; i--) {
+    const codigo = String(filas[i][1]), nombre = String(filas[i][3]);
+    const vacia = filas[i].every(function (celda) { return celda === '' || celda === null; });
+    if (vacia || codigo.indexOf('prueba-') === 0 || /^prueba\b/i.test(nombre.trim())) { hoja.deleteRow(i + 2); borradas++; }
   }
-  Logger.log('Filas de prueba borradas: ' + borradas);
+  Logger.log('Filas borradas (de prueba o vacías): ' + borradas);
 }
 
 // Para probar desde el editor (Ejecutar ▶ con esta función elegida): anota una confirmación de ejemplo.
