@@ -1222,7 +1222,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
         </fieldset>
 
         <!-- Después de mandar por WhatsApp: la despedida del pie de la hoja, en la tarjeta (los nombres se copian de
-             ahí para escribirse con la misma pluma), y un botón por si hay que cargar la respuesta de otra persona -->
+             ahí para escribirse con la misma pluma), y un botón que vuelve a la invitación -->
         <fieldset class="paso paso-gracias" id="p-gracias" tabindex="-1" hidden>
           <img class="rama" src="rama-5.webp" width="652" height="129" alt="">
           <p class="ojo" id="gracias-ojo">Te esperamos para celebrar juntos</p>
@@ -1266,7 +1266,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   // Se muestra en el diagnóstico (?debug) para saber qué versión cargó el teléfono
-  const VERSION = '34';
+  const VERSION = '35';
 
   // ---- Pétalos en acuarela ----
   // Los de fondo están pegados a la pantalla, arriba de todo, y siguen cayendo mientras se baja. Son elementos con
@@ -1971,7 +1971,8 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 
   // ---- Despedida ----
   // La ramita se agranda y los nombres se escriben con la misma pluma que al pie de la hoja (se copia ese dibujo).
-  // "Volver al inicio" vacía la tarjeta y vuelve al primer paso (por si hay que cargar otra respuesta)
+  // "Volver al inicio" cierra la hoja y lleva arriba de la invitación; la tarjeta se vacía cuando ya no se ve,
+  // así la próxima vez que se abra arranca desde el primer paso (por si hay que cargar otra respuesta)
   const despedida = [$('.paso-gracias .rama'), $('#gracias-nombres')];
   $('#gracias-nombres').appendChild($('.hoja .cierre .nombres-svg').cloneNode(true));
   function prepararDespedida() {
@@ -1982,7 +1983,11 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   }
   function escribirDespedida() { despedida.forEach(function (el) { el.classList.add('visto'); }); }
   prepararDespedida();
-  $('#otra-respuesta').addEventListener('click', function () { if (!cambiando) vaciarTarjeta(); });
+  $('#otra-respuesta').addEventListener('click', function () {
+    bajarHoja();
+    window.scrollTo({ top: 0, behavior: reducir ? 'auto' : 'smooth' });
+    setTimeout(vaciarTarjeta, reducir ? 0 : 900);
+  });
   $('#atras').addEventListener('click', function () {
     if (cambiando) return;
     const r = ruta(); const i = r.indexOf(actual);
