@@ -903,9 +903,9 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
    Lo que en el celular va en una sola columna acá aprovecha el ancho: una barra arriba con las partes de la
    invitación y el monograma, la portada a dos columnas (el arco a la izquierda; los nombres, la frase, la fecha y
    la cuenta regresiva a la derecha), la iglesia y la chacra bien grandes y el salón casi a todo lo ancho */
-.barra { display: none; }
+.navegacion { display: none; }
 @media (min-width: 1024px) {
-  .barra {
+  .navegacion {
     position: fixed;
     inset: 0 0 auto;
     z-index: 22;
@@ -924,18 +924,21 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     pointer-events: none;
     transition: opacity .7s ease .8s;
   }
-  .abierta .barra { opacity: 1; pointer-events: auto; }
-  .barra a { color: var(--tinta-suave); text-decoration: none; transition: color .25s ease; }
-  .barra a:hover { color: var(--tinta); }
-  .barra-mono {
+  .abierta .navegacion { opacity: 1; pointer-events: auto; }
+  .navegacion a { color: var(--tinta-suave); text-decoration: none; transition: color .25s ease; }
+  .navegacion a:hover { color: var(--tinta); }
+  .navegacion-mono {
     box-sizing: border-box;
     width: 64px;
     height: 64px;
     margin: 0 8px;
     border: 1px solid var(--tinta);
     border-radius: 50%;
-    display: grid;
-    place-items: center;
+    /* flex y no grid: con grid, la "N", el "&" y la "M" quedaban como tres celdas apiladas */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
     font-family: var(--f-script);
     font-size: 23px;
     line-height: 1;
@@ -943,7 +946,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     padding-top: 5px;
     color: var(--tinta) !important;
   }
-  .barra-mono .amp { color: #A8A955; font-size: 19px; margin: 0 1px; }
+  .navegacion-mono .amp { color: #A8A955; font-size: 19px; margin: 0 1px; }
   /* Al ir a una parte desde la barra, el título no queda tapado por la barra */
   #ceremonia, #fiesta, #t-regalos, #t-lugares { scroll-margin-top: 110px; }
 
@@ -1113,10 +1116,10 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 </div>
 
 <!-- Barra para pantallas anchas (en el celular no se muestra): las partes de la invitación y el monograma en el medio -->
-<nav class="barra" aria-label="Partes de la invitación">
+<nav class="navegacion" aria-label="Partes de la invitación">
   <a href="#ceremonia">Ceremonia</a>
   <a href="#fiesta">Fiesta</a>
-  <a class="barra-mono" href="#contenido" aria-label="Volver al principio">N<span class="amp">&amp;</span>M</a>
+  <a class="navegacion-mono" href="#contenido" aria-label="Volver al principio">N<span class="amp">&amp;</span>M</a>
   <a href="#t-regalos">Regalos</a>
   <a href="#confirmar">Confirmar asistencia</a>
 </nav>
