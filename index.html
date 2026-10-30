@@ -1203,12 +1203,14 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
         <fieldset class="paso" id="p-extras" tabindex="-1" hidden>
           <legend class="titulo-paso" id="leg-extras">Para terminar</legend>
           <div class="campo" id="fila-cancion">
-            <label for="cancion">¿Qué canción no puede faltar en la fiesta? (opcional)</label>
+            <label for="cancion">¿Qué canción no puede faltar en la fiesta?</label>
             <input id="cancion" name="cancion" type="text" placeholder="Tema y artista" autocomplete="off">
+            <p class="error" id="error-cancion" hidden>Contanos qué canción no puede faltar.</p>
           </div>
           <div class="campo">
-            <label for="mensaje" id="lbl-mensaje">¿Querés dejarles un mensaje a los novios? (opcional)</label>
-            <textarea id="mensaje" name="mensaje" rows="3" placeholder="Opcional"></textarea>
+            <label for="mensaje" id="lbl-mensaje">Dejales un mensaje a los novios</label>
+            <textarea id="mensaje" name="mensaje" rows="3" placeholder="Unas palabras para Nati y Mati"></textarea>
+            <p class="error" id="error-mensaje" hidden>Escribiles unas palabras a los novios.</p>
           </div>
         </fieldset>
 
@@ -1266,7 +1268,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   // Se muestra en el diagnóstico (?debug) para saber qué versión cargó el teléfono
-  const VERSION = '35';
+  const VERSION = '36';
 
   // ---- Pétalos en acuarela ----
   // Los de fondo están pegados a la pantalla, arriba de todo, y siguen cayendo mientras se baja. Son elementos con
@@ -1763,6 +1765,8 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     estado.mensaje = $('#mensaje').value;
     if (estado.nombre.trim().length >= 2) $('#error-nombre').hidden = true;
     if (estado.bebidas.length) $('#error-bebidas').hidden = true;
+    if (estado.cancion.trim()) $('#error-cancion').hidden = true;
+    if (estado.mensaje.trim()) $('#error-mensaje').hidden = true;
     aplicarModo();
     guardar();
   }
@@ -1948,6 +1952,17 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
       $('#b-fernet').focus();
       return;
     }
+    // La canción (solo si viene) y el mensaje son obligatorios
+    if (actual === 'extras' && estado.asiste !== 'no' && !estado.cancion.trim()) {
+      $('#error-cancion').hidden = false;
+      $('#cancion').focus();
+      return;
+    }
+    if (actual === 'extras' && !estado.mensaje.trim()) {
+      $('#error-mensaje').hidden = false;
+      $('#mensaje').focus();
+      return;
+    }
     const r = ruta();
     const i = r.indexOf(actual);
     if (i !== -1 && i < r.length - 1) ir(r[i + 1], 1);
@@ -1957,8 +1972,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   function vaciarTarjeta() {
     estado = { id: '', asiste: null, nombre: '', bebidas: [], comida: [], comidaOtra: '', cancion: '', mensaje: '' };
     form.reset();
-    $('#error-nombre').hidden = true;
-    $('#error-bebidas').hidden = true;
+    $$('.error', form).forEach(function (e) { e.hidden = true; });
     try { localStorage.removeItem(CLAVE); } catch (e) {}
     aplicarModo();
     prepararDespedida();
