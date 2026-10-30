@@ -913,7 +913,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     justify-content: center;
     align-items: center;
     gap: 48px;
-    padding: 12px 32px;
+    padding: 13px 32px;
     background: rgba(251, 245, 235, .9);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -944,8 +944,10 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     color: var(--tinta) !important;
   }
   .navegacion-mono .amp { color: #A8A955; font-size: 19px; margin: 0 1px; }
-  /* Un poco más chico y con aire arriba: la ramita del sello asoma por encima del lacre y no debe cortarse */
-  .navegacion-mono svg { width: 58px; height: 58px; margin-top: 10px; overflow: visible; display: block; }
+  /* El sello no estira la barra: va en posición absoluta, con el lacre apoyado sobre el borde de abajo y la
+     ramita saliéndose por debajo */
+  .navegacion-mono { position: relative; height: 26px; }
+  .navegacion-mono svg { position: absolute; left: 50%; top: -12px; width: 60px; height: 60px; margin-left: -30px; overflow: visible; display: block; }
   /* Al ir a una parte desde la barra, el título no queda tapado por la barra */
   #ceremonia, #fiesta, #t-regalos, #t-lugares { scroll-margin-top: 110px; }
 
