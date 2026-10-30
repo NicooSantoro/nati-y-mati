@@ -925,8 +925,9 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     transition: opacity .7s ease .8s;
   }
   .abierta .navegacion { opacity: 1; pointer-events: auto; }
-  .navegacion a { color: var(--tinta-suave); text-decoration: none; transition: color .25s ease; }
-  .navegacion a:hover { color: var(--tinta); }
+  /* Los links con la misma letra que la fecha de la portada: serif en mayúsculas espaciadas */
+  .navegacion a { font-size: 14px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--tinta); text-decoration: none; transition: color .25s ease; }
+  .navegacion a:hover { color: var(--oliva-grande); }
   /* En el medio, el sello de lacre del sobre (se copia de ahí al cargar); si no hay JavaScript queda el monograma */
   .navegacion-mono {
     box-sizing: border-box;
@@ -944,10 +945,10 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     color: var(--tinta) !important;
   }
   .navegacion-mono .amp { color: #A8A955; font-size: 19px; margin: 0 1px; }
-  /* El sello no estira la barra: va en posición absoluta, con el lacre apoyado sobre el borde de abajo y la
-     ramita saliéndose por debajo */
+  /* El sello no estira la barra: va en posición absoluta, centrado en ella; solo la ramita se sale por arriba y
+     por abajo */
   .navegacion-mono { position: relative; height: 26px; }
-  .navegacion-mono svg { position: absolute; left: 50%; top: -12px; width: 60px; height: 60px; margin-left: -30px; overflow: visible; display: block; }
+  .navegacion-mono svg { position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px; overflow: visible; display: block; }
   /* Al ir a una parte desde la barra, el título no queda tapado por la barra */
   #ceremonia, #fiesta, #t-regalos, #t-lugares { scroll-margin-top: 110px; }
 
