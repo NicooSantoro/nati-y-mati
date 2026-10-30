@@ -1228,7 +1228,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
           <p class="ojo" id="gracias-ojo">Te esperamos para celebrar juntos</p>
           <p class="te-esperamos" id="gracias-nombres"><span class="solo-lectores">Natalia &amp; Matías</span></p>
           <p class="firma">18 · 12 · 2026</p>
-          <button type="button" class="btn-linea" id="otra-respuesta">Confirmar a otra persona</button>
+          <button type="button" class="btn-linea" id="otra-respuesta">Volver al inicio</button>
         </fieldset>
 
         <div class="nav-pasos">
@@ -1266,7 +1266,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   // Se muestra en el diagnóstico (?debug) para saber qué versión cargó el teléfono
-  const VERSION = '33';
+  const VERSION = '34';
 
   // ---- Pétalos en acuarela ----
   // Los de fondo están pegados a la pantalla, arriba de todo, y siguen cayendo mientras se baja. Son elementos con
@@ -1971,7 +1971,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 
   // ---- Despedida ----
   // La ramita se agranda y los nombres se escriben con la misma pluma que al pie de la hoja (se copia ese dibujo).
-  // "Confirmar a otra persona" vacía la tarjeta y vuelve al primer paso
+  // "Volver al inicio" vacía la tarjeta y vuelve al primer paso (por si hay que cargar otra respuesta)
   const despedida = [$('.paso-gracias .rama'), $('#gracias-nombres')];
   $('#gracias-nombres').appendChild($('.hoja .cierre .nombres-svg').cloneNode(true));
   function prepararDespedida() {
