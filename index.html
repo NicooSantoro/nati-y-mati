@@ -1203,14 +1203,12 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
         <fieldset class="paso" id="p-extras" tabindex="-1" hidden>
           <legend class="titulo-paso" id="leg-extras">Para terminar</legend>
           <div class="campo" id="fila-cancion">
-            <label for="cancion">¿Qué canción no puede faltar en la fiesta?</label>
+            <label for="cancion">¿Qué canción no puede faltar en la fiesta? (opcional)</label>
             <input id="cancion" name="cancion" type="text" placeholder="Tema y artista" autocomplete="off">
-            <p class="error" id="error-cancion" hidden>Contanos qué canción no puede faltar.</p>
           </div>
           <div class="campo">
-            <label for="mensaje" id="lbl-mensaje">Dejales un mensaje a los novios</label>
-            <textarea id="mensaje" name="mensaje" rows="3" placeholder="Unas palabras para Nati y Mati"></textarea>
-            <p class="error" id="error-mensaje" hidden>Escribiles unas palabras a los novios.</p>
+            <label for="mensaje" id="lbl-mensaje">¿Querés dejarles un mensaje a los novios? (opcional)</label>
+            <textarea id="mensaje" name="mensaje" rows="3" placeholder="Opcional"></textarea>
           </div>
         </fieldset>
 
@@ -1268,7 +1266,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   // Se muestra en el diagnóstico (?debug) para saber qué versión cargó el teléfono
-  const VERSION = '36';
+  const VERSION = '37';
 
   // ---- Pétalos en acuarela ----
   // Los de fondo están pegados a la pantalla, arriba de todo, y siguen cayendo mientras se baja. Son elementos con
@@ -1765,8 +1763,6 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     estado.mensaje = $('#mensaje').value;
     if (estado.nombre.trim().length >= 2) $('#error-nombre').hidden = true;
     if (estado.bebidas.length) $('#error-bebidas').hidden = true;
-    if (estado.cancion.trim()) $('#error-cancion').hidden = true;
-    if (estado.mensaje.trim()) $('#error-mensaje').hidden = true;
     aplicarModo();
     guardar();
   }
@@ -1787,8 +1783,11 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   form.addEventListener('change', leer);
 
 
+  // Se escucha el clic y no el cambio: si el invitado vuelve atrás y toca la misma opción que ya tenía elegida,
+  // "change" no se dispara y se quedaba sin poder avanzar
   $$('input[name=asiste]').forEach(function (i) {
-    i.addEventListener('change', function () {
+    i.addEventListener('click', function () {
+      if (cambiando) return;
       leer();
       setTimeout(function () { if (actual === 'asistencia') ir('datos', 1); }, reducir ? 0 : 380);
     });
@@ -1950,17 +1949,6 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     if (actual === 'bebidas' && !estado.bebidas.length) {
       $('#error-bebidas').hidden = false;
       $('#b-fernet').focus();
-      return;
-    }
-    // La canción (solo si viene) y el mensaje son obligatorios
-    if (actual === 'extras' && estado.asiste !== 'no' && !estado.cancion.trim()) {
-      $('#error-cancion').hidden = false;
-      $('#cancion').focus();
-      return;
-    }
-    if (actual === 'extras' && !estado.mensaje.trim()) {
-      $('#error-mensaje').hidden = false;
-      $('#mensaje').focus();
       return;
     }
     const r = ruta();
