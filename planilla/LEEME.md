@@ -49,4 +49,10 @@ Detalles que conviene saber:
     seguro: el código del invitado hace que se reemplace su fila en vez de duplicarse. El invitado nunca ve un
     error, y su respuesta igual llega por WhatsApp.
 - `borrarPruebas` (desde el editor) borra las filas cuyo código empieza con `prueba-` (las de `probar` y las de
-  las pruebas de carga).
+  las pruebas de carga), las de nombre "Prueba…", las vacías, y las mismas pruebas del Log.
+- Pestaña **Log**: cada envío se agrega tal cual llegó y nunca se edita. Como Confirmaciones reemplaza la fila
+  cuando alguien vuelve a responder, el Log es el historial y el respaldo.
+- Pestaña **Resumen**: fórmulas sobre Confirmaciones (van, no van, restricciones, bebidas). La arma
+  `prepararResumen`; si se borra, volver a ejecutarla.
+- El script valida lo que llega (respuesta si/no, nombre, opciones conocidas, largos máximos) y, si algo falla,
+  manda un mail al dueño de la planilla (como mucho uno por minuto).
