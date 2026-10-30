@@ -508,6 +508,8 @@ body.con-hoja .lluvia * { animation-play-state: paused; }
 img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
 .arte, .lugar-arte, .rama { pointer-events: none; }
 .hero-texto { display: flex; flex-direction: column; align-items: center; }
+/* La cuenta regresiva ocupa todo el ancho del texto de la portada, como cuando era una sección aparte */
+.hero-texto > .cuenta { align-self: stretch; }
 .bendicion { font-family: var(--f-sans); font-size: 12px; font-weight: 500; letter-spacing: .24em; line-height: 1.8; text-transform: uppercase; color: var(--tinta-suave); max-width: 32ch; }
 .nombres {
   font-family: var(--f-script);
@@ -896,6 +898,89 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 @media (max-width: 460px) {
   .titulo-paso { font-size: 27px; }
 }
+
+/* ---------- Pantallas anchas (laptop) ----------
+   Lo que en el celular va en una sola columna acá aprovecha el ancho: una barra arriba con las partes de la
+   invitación y el monograma, la portada a dos columnas (el arco a la izquierda; los nombres, la frase, la fecha y
+   la cuenta regresiva a la derecha), la iglesia y la chacra bien grandes y el salón casi a todo lo ancho */
+.barra { display: none; }
+@media (min-width: 1024px) {
+  .barra {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 22;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 48px;
+    padding: 12px 32px;
+    background: rgba(251, 245, 235, .9);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--linea);
+    font-size: 17px;
+    letter-spacing: .03em;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .7s ease .8s;
+  }
+  .abierta .barra { opacity: 1; pointer-events: auto; }
+  .barra a { color: var(--tinta-suave); text-decoration: none; transition: color .25s ease; }
+  .barra a:hover { color: var(--tinta); }
+  .barra-mono {
+    box-sizing: border-box;
+    width: 64px;
+    height: 64px;
+    margin: 0 8px;
+    border: 1px solid var(--tinta);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-family: var(--f-script);
+    font-size: 23px;
+    line-height: 1;
+    white-space: nowrap;
+    padding-top: 5px;
+    color: var(--tinta) !important;
+  }
+  .barra-mono .amp { color: #A8A955; font-size: 19px; margin: 0 1px; }
+  /* Al ir a una parte desde la barra, el título no queda tapado por la barra */
+  #ceremonia, #fiesta, #t-regalos, #t-lugares { scroll-margin-top: 110px; }
+
+  .pagina { max-width: 1200px; padding: 112px 56px 96px; }
+  /* Portada a dos columnas */
+  .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 56px; align-items: center; text-align: left; }
+  .arte-marco, .arte { max-width: 540px; }
+  .arte-marco { justify-self: center; }
+  .hero-texto { align-items: flex-start; }
+  .nombres { font-size: 80px; padding-inline: 0; margin-bottom: calc(14px - .33em); }
+  .nombres-svg { margin: 0; }
+  .lead { font-size: 19px; max-width: 40ch; }
+  .fecha-grande { font-size: 24px; margin-top: 16px; }
+  .cuenta { align-items: flex-start; text-align: left; }
+  .cuenta .rama { margin: 34px 0 0; width: 220px; }
+  #t-cuenta { margin-top: 24px; }
+  .cuenta-grid { max-width: 420px; }
+  .num { font-size: 52px; }
+
+  /* Lugares: iglesia y chacra grandes, una al lado de la otra */
+  .lugares .rama { margin-top: 72px; }
+  .titulo { font-size: 66px; }
+  .lugares-grid { max-width: 1000px; column-gap: 88px; margin-top: 36px; }
+  .lugar-arte.chico { width: 88%; }
+  .lugar h3 { font-size: 54px; }
+  .lugar .detalle { font-size: 18px; }
+  .sitio { font-size: 22px; }
+  .regalos { margin-top: 80px; max-width: 640px; }
+  .regalos > p { max-width: 44ch; font-size: 19px; }
+  .lugares-confirmar { margin-top: 64px; min-height: 58px; font-size: 17px; padding: 0 44px; }
+  .lugar-arte.salon-medio { width: min(100%, 760px); margin-top: 72px; }
+
+  /* Despedida */
+  .cierre .rama { margin-top: 80px; }
+  .te-esperamos { font-size: 92px; }
+  .firma { font-size: 15px; }
+}
 /* Con el teléfono en modo oscuro, los mismos colores: el navegador de Samsung solo deja en paz a las páginas que
    contemplan ese modo, y esta regla es nuestro "tema oscuro"... con los colores de siempre. Ojo: no declarar acá
    ningún elemento como "light" solo, porque Chrome recolorea justo a esos */
@@ -1027,6 +1112,15 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   <svg viewBox="0 0 24 24"><path d="M6.5 9.5 12 15l5.5-5.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
 </div>
 
+<!-- Barra para pantallas anchas (en el celular no se muestra): las partes de la invitación y el monograma en el medio -->
+<nav class="barra" aria-label="Partes de la invitación">
+  <a href="#ceremonia">Ceremonia</a>
+  <a href="#fiesta">Fiesta</a>
+  <a class="barra-mono" href="#contenido" aria-label="Volver al principio">N<span class="amp">&amp;</span>M</a>
+  <a href="#t-regalos">Regalos</a>
+  <a href="#confirmar">Confirmar asistencia</a>
+</nav>
+
 <main class="pagina" id="contenido" tabindex="-1">
   <header class="hero">
     <div class="arte-marco">
@@ -1037,34 +1131,35 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
       <h1 class="nombres"><span class="solo-lectores">Natalia &amp; Matías</span><svg class="nombres-svg" viewBox="0 -1637 12934 2294" aria-hidden="true"><path pathLength="1" style="--t: 0.00s" d="M954 19Q940 19 940 5Q940 -3 948 -8Q952 -12 957.5 -16.5Q963 -21 967 -26Q992 -57 1012.0 -100.5Q1032 -144 1054.5 -213.0Q1077 -282 1108 -388Q1161 -565 1260.5 -783.0Q1360 -1001 1481 -1209Q1405 -1114 1341.0 -1034.5Q1277 -955 1213.0 -878.0Q1149 -801 1074.5 -715.5Q1000 -630 902 -522Q668 -267 497.0 -132.5Q326 2 201 2Q99 2 49.5 -38.0Q0 -78 0 -133Q0 -178 31.0 -197.5Q62 -217 93 -217Q110 -217 127.0 -206.0Q144 -195 144 -171Q144 -152 127.0 -136.5Q110 -121 88 -121Q75 -121 62.5 -123.0Q50 -125 40 -131V-125Q40 -82 78.5 -53.5Q117 -25 199 -25Q261 -25 356.5 -76.5Q452 -128 589.0 -249.0Q726 -370 911 -578Q1225 -932 1390.5 -1138.0Q1556 -1344 1572 -1368Q1590 -1390 1597 -1390Q1606 -1390 1606 -1381Q1606 -1375 1602 -1368L1588 -1342Q1563 -1300 1549.0 -1261.5Q1535 -1223 1523 -1181Q1508 -1129 1493.5 -1073.5Q1479 -1018 1457.0 -946.5Q1435 -875 1398 -774Q1358 -664 1317.0 -578.0Q1276 -492 1224.5 -400.0Q1173 -308 1099 -178Q1146 -235 1225.0 -329.5Q1304 -424 1401.5 -537.5Q1499 -651 1604.0 -767.5Q1709 -884 1808 -986Q1985 -1170 2127.0 -1281.5Q2269 -1393 2389.5 -1444.0Q2510 -1495 2623 -1496Q2728 -1496 2782.0 -1449.5Q2836 -1403 2837 -1318Q2838 -1256 2793.5 -1180.5Q2749 -1105 2669.5 -1034.0Q2590 -963 2485 -912Q2448 -895 2429 -895Q2418 -895 2418 -902Q2418 -910 2435 -918Q2516 -949 2594.0 -1010.0Q2672 -1071 2723.0 -1147.5Q2774 -1224 2774 -1301Q2774 -1380 2731.5 -1423.5Q2689 -1467 2612 -1467Q2500 -1467 2368.5 -1403.0Q2237 -1339 2073.0 -1199.0Q1909 -1059 1700 -830Q1534 -648 1399.0 -489.5Q1264 -331 1165.5 -212.0Q1067 -93 1010 -28Q984 3 972.0 11.0Q960 19 954 19ZM508 -815Q431 -815 363.0 -845.0Q295 -875 253.5 -936.5Q212 -998 212 -1091Q212 -1185 269.0 -1260.5Q326 -1336 427.5 -1380.0Q529 -1424 662 -1424Q735 -1424 800.0 -1413.5Q865 -1403 943 -1371Q994 -1350 1039.0 -1328.5Q1084 -1307 1141 -1281Q1175 -1267 1211.0 -1258.0Q1247 -1249 1280 -1249Q1317 -1249 1356.5 -1264.0Q1396 -1279 1424 -1303Q1441 -1319 1447 -1319Q1455 -1319 1455 -1311Q1455 -1303 1441 -1288Q1414 -1262 1371.0 -1241.5Q1328 -1221 1283.5 -1209.5Q1239 -1198 1208 -1198Q1146 -1198 1065.0 -1220.5Q984 -1243 922 -1280Q843 -1326 789.5 -1348.0Q736 -1370 695.0 -1377.5Q654 -1385 612 -1385Q513 -1385 429.0 -1346.0Q345 -1307 294.5 -1239.0Q244 -1171 244 -1085Q244 -979 315.0 -909.0Q386 -839 504 -839Q573 -839 639.0 -868.5Q705 -898 748.5 -952.0Q792 -1006 792 -1081Q792 -1121 765 -1150Q758 -1142 748.5 -1135.5Q739 -1129 726 -1129Q707 -1129 692.0 -1141.5Q677 -1154 677 -1174Q677 -1191 689.5 -1205.0Q702 -1219 726 -1219Q763 -1219 793.0 -1182.5Q823 -1146 823 -1085Q823 -1004 777.0 -943.5Q731 -883 659.0 -849.0Q587 -815 508 -815Z"></path><path pathLength="1" style="--t: 0.21s" d="M1586 2Q1522 2 1492.5 -33.0Q1463 -68 1463 -129Q1463 -196 1491.5 -272.0Q1520 -348 1586 -423Q1721 -580 1838.5 -632.5Q1956 -685 2059 -685Q2111 -685 2147.0 -663.0Q2183 -641 2183 -603Q2183 -574 2171 -544Q2203 -582 2225.5 -610.5Q2248 -639 2269 -665Q2295 -657 2329 -657Q2343 -657 2367.0 -658.0Q2391 -659 2404 -661L2067 -255Q2003 -179 1975.0 -131.5Q1947 -84 1947 -58Q1947 -26 1978 -26Q2032 -26 2090.0 -57.5Q2148 -89 2204.0 -138.5Q2260 -188 2309.0 -241.5Q2358 -295 2395.5 -340.5Q2433 -386 2453 -408L2473 -391Q2451 -366 2411.0 -319.0Q2371 -272 2319.5 -217.0Q2268 -162 2208.5 -112.0Q2149 -62 2086.5 -30.0Q2024 2 1963 2Q1863 2 1863 -60Q1863 -83 1871.5 -106.5Q1880 -130 1906.0 -167.5Q1932 -205 1984 -268L1974 -272Q1852 -122 1748.5 -60.0Q1645 2 1586 2ZM1590 -28Q1654 -28 1759.0 -102.5Q1864 -177 2011 -351Q2035 -380 2055.5 -405.0Q2076 -430 2095 -452Q2118 -487 2136.5 -525.0Q2155 -563 2155 -594Q2155 -625 2133.0 -639.5Q2111 -654 2085 -654Q2036 -654 1926.5 -583.5Q1817 -513 1686 -358Q1611 -268 1578.0 -198.0Q1545 -128 1545 -80Q1545 -28 1590 -28Z"></path><path pathLength="1" style="--t: 0.33s" d="M2381 2Q2326 2 2298.5 -20.0Q2271 -42 2271 -76Q2271 -103 2278.0 -129.5Q2285 -156 2308.0 -197.0Q2331 -238 2378.0 -307.5Q2425 -377 2505 -490L2763 -853H2684Q2654 -853 2654 -866Q2654 -882 2692 -882H2783L2968 -1142Q2981 -1140 3002.5 -1138.5Q3024 -1137 3064 -1138Q3084 -1138 3107 -1142L2914 -882H3172Q3200 -882 3200 -868Q3200 -853 3175 -853H2892L2628 -497Q2534 -371 2477.0 -290.0Q2420 -209 2390.5 -162.0Q2361 -115 2350.5 -92.0Q2340 -69 2340 -58Q2340 -28 2390 -26Q2459 -27 2532.5 -71.5Q2606 -116 2674.0 -180.5Q2742 -245 2796.0 -307.5Q2850 -370 2880 -406L2902 -389Q2873 -355 2817.0 -291.0Q2761 -227 2688.5 -159.5Q2616 -92 2537.0 -45.0Q2458 2 2381 2Z"></path><path pathLength="1" style="--t: 0.40s" d="M2871 2Q2807 2 2777.5 -33.0Q2748 -68 2748 -129Q2748 -196 2776.5 -272.0Q2805 -348 2871 -423Q3006 -580 3123.5 -632.5Q3241 -685 3344 -685Q3396 -685 3432.0 -663.0Q3468 -641 3468 -603Q3468 -574 3456 -544Q3488 -582 3510.5 -610.5Q3533 -639 3554 -665Q3580 -657 3614 -657Q3628 -657 3652.0 -658.0Q3676 -659 3689 -661L3352 -255Q3288 -179 3260.0 -131.5Q3232 -84 3232 -58Q3232 -26 3263 -26Q3317 -26 3375.0 -57.5Q3433 -89 3489.0 -138.5Q3545 -188 3594.0 -241.5Q3643 -295 3680.5 -340.5Q3718 -386 3738 -408L3758 -391Q3736 -366 3696.0 -319.0Q3656 -272 3604.5 -217.0Q3553 -162 3493.5 -112.0Q3434 -62 3371.5 -30.0Q3309 2 3248 2Q3148 2 3148 -60Q3148 -83 3156.5 -106.5Q3165 -130 3191.0 -167.5Q3217 -205 3269 -268L3259 -272Q3137 -122 3033.5 -60.0Q2930 2 2871 2ZM2875 -28Q2939 -28 3044.0 -102.5Q3149 -177 3296 -351Q3320 -380 3340.5 -405.0Q3361 -430 3380 -452Q3403 -487 3421.5 -525.0Q3440 -563 3440 -594Q3440 -625 3418.0 -639.5Q3396 -654 3370 -654Q3321 -654 3211.5 -583.5Q3102 -513 2971 -358Q2896 -268 2863.0 -198.0Q2830 -128 2830 -80Q2830 -28 2875 -28Z"></path><path pathLength="1" style="--t: 0.52s" d="M3664 2Q3622 2 3594.5 -21.5Q3567 -45 3567 -79Q3567 -106 3573.5 -131.5Q3580 -157 3602.5 -197.5Q3625 -238 3671.0 -307.0Q3717 -376 3796 -490L4569 -1595Q4583 -1594 4604.5 -1592.0Q4626 -1590 4666 -1591Q4674 -1591 4684.5 -1592.5Q4695 -1594 4708 -1595L3886 -454Q3796 -328 3745.0 -254.5Q3694 -181 3670.0 -142.5Q3646 -104 3640.0 -87.5Q3634 -71 3634 -59Q3634 -26 3681 -26Q3740 -26 3805.5 -61.0Q3871 -96 3935.0 -148.5Q3999 -201 4053.0 -256.0Q4107 -311 4144.5 -353.0Q4182 -395 4194 -406L4214 -389Q4201 -376 4162.0 -333.0Q4123 -290 4066.0 -233.5Q4009 -177 3941.5 -123.0Q3874 -69 3802.5 -33.5Q3731 2 3664 2Z"></path><path pathLength="1" style="--t: 0.59s" d="M4647 -876Q4619 -876 4602.5 -893.5Q4586 -911 4586 -938Q4586 -973 4615.5 -1002.5Q4645 -1032 4686 -1032Q4714 -1032 4730.5 -1013.5Q4747 -995 4747 -969Q4747 -932 4715.5 -904.0Q4684 -876 4647 -876ZM4136 2Q4075 2 4037.5 -20.5Q4000 -43 4000 -81Q4000 -111 4015.0 -150.5Q4030 -190 4072.5 -254.0Q4115 -318 4196.5 -420.5Q4278 -523 4411 -678Q4420 -677 4454.0 -676.0Q4488 -675 4507 -675Q4524 -675 4532.5 -675.5Q4541 -676 4549 -677Q4403 -505 4310.5 -394.0Q4218 -283 4168.0 -217.0Q4118 -151 4099.0 -116.0Q4080 -81 4080 -60Q4080 -34 4108.0 -30.0Q4136 -26 4153 -26Q4207 -26 4271.0 -62.5Q4335 -99 4398.5 -153.5Q4462 -208 4516.5 -264.0Q4571 -320 4606.0 -360.5Q4641 -401 4647 -407L4667 -389Q4656 -377 4619.0 -334.0Q4582 -291 4527.0 -234.5Q4472 -178 4406.5 -124.0Q4341 -70 4271.5 -34.0Q4202 2 4136 2Z"></path><path pathLength="1" style="--t: 0.66s" d="M4637 2Q4573 2 4543.5 -33.0Q4514 -68 4514 -129Q4514 -196 4542.5 -272.0Q4571 -348 4637 -423Q4772 -580 4889.5 -632.5Q5007 -685 5110 -685Q5162 -685 5198.0 -663.0Q5234 -641 5234 -603Q5234 -574 5222 -544Q5254 -582 5276.5 -610.5Q5299 -639 5320 -665Q5346 -657 5380 -657Q5394 -657 5418.0 -658.0Q5442 -659 5455 -661L5118 -255Q5054 -179 5026.0 -131.5Q4998 -84 4998 -58Q4998 -26 5029 -26Q5083 -26 5141.0 -57.5Q5199 -89 5255.0 -138.5Q5311 -188 5360.0 -241.5Q5409 -295 5446.5 -340.5Q5484 -386 5504 -408L5524 -391Q5502 -366 5462.0 -319.0Q5422 -272 5370.5 -217.0Q5319 -162 5259.5 -112.0Q5200 -62 5137.5 -30.0Q5075 2 5014 2Q4914 2 4914 -60Q4914 -83 4922.5 -106.5Q4931 -130 4957.0 -167.5Q4983 -205 5035 -268L5025 -272Q4903 -122 4799.5 -60.0Q4696 2 4637 2ZM4641 -28Q4705 -28 4810.0 -102.5Q4915 -177 5062 -351Q5086 -380 5106.5 -405.0Q5127 -430 5146 -452Q5169 -487 5187.5 -525.0Q5206 -563 5206 -594Q5206 -625 5184.0 -639.5Q5162 -654 5136 -654Q5087 -654 4977.5 -583.5Q4868 -513 4737 -358Q4662 -268 4629.0 -198.0Q4596 -128 4596 -80Q4596 -28 4641 -28Z"></path><path class="amp" pathLength="1" style="--t: 0.93s" d="M6574 -18Q6559 -21 6531.5 -22.5Q6504 -24 6483 -24Q6472 -24 6454.5 -23.0Q6437 -22 6413 -19Q6436 -56 6457.0 -91.0Q6478 -126 6497 -159Q6420 -221 6371.5 -314.0Q6323 -407 6323 -513Q6323 -627 6378.0 -703.0Q6433 -779 6515 -779Q6574 -779 6623.5 -723.5Q6673 -668 6673 -564Q6673 -507 6643.0 -415.0Q6613 -323 6563 -224Q6691 -422 6803.0 -562.0Q6915 -702 7012.5 -803.0Q7110 -904 7196 -984Q7213 -1000 7224 -1000Q7236 -1000 7236 -991Q7236 -984 7204 -953Q7101 -853 6996.0 -720.0Q6891 -587 6794.5 -434.0Q6698 -281 6620 -119Q6683 -93 6753 -93Q6880 -93 6975 -174Q7016 -211 7040.5 -257.0Q7065 -303 7065 -353Q7065 -356 7063 -368Q7023 -370 7023 -404Q7023 -415 7032.0 -424.0Q7041 -433 7054 -433Q7100 -433 7100 -367Q7100 -306 7070.5 -249.5Q7041 -193 6991 -152Q6886 -66 6747 -66Q6678 -66 6608 -94ZM6512 -188Q6580 -313 6611.5 -410.5Q6643 -508 6643 -575Q6643 -652 6606.5 -695.5Q6570 -739 6526 -739Q6490 -739 6456.5 -707.0Q6423 -675 6401.5 -623.0Q6380 -571 6380 -511Q6380 -413 6415.5 -329.5Q6451 -246 6512 -188Z"></path><path pathLength="1" style="--t: 1.15s" d="M9316 2Q9255 2 9225.0 -25.5Q9195 -53 9195 -93Q9195 -122 9221.0 -185.0Q9247 -248 9329 -372Q9425 -515 9545.0 -660.5Q9665 -806 9790.5 -943.0Q9916 -1080 10032.5 -1199.0Q10149 -1318 10239 -1407Q10194 -1375 10139.0 -1329.0Q10084 -1283 10004.0 -1210.5Q9924 -1138 9807.0 -1028.0Q9690 -918 9522 -757Q9438 -677 9278.5 -512.0Q9119 -347 8904 -96Q8852 -35 8832.5 -21.0Q8813 -7 8802 -7Q8795 -7 8787.5 -17.0Q8780 -27 8780 -49Q8780 -133 8838.0 -269.5Q8896 -406 9002.5 -578.5Q9109 -751 9255.0 -944.0Q9401 -1137 9576 -1335Q9520 -1284 9371.5 -1130.0Q9223 -976 8960 -687Q8732 -437 8550.0 -283.5Q8368 -130 8228 -59Q8108 1 8016 1Q7922 1 7875.0 -35.0Q7828 -71 7828 -127Q7828 -173 7859.0 -195.5Q7890 -218 7921 -218Q7937 -218 7954.5 -207.0Q7972 -196 7972 -172Q7972 -153 7955.0 -137.5Q7938 -122 7915 -122Q7902 -122 7889.5 -124.0Q7877 -126 7867 -133Q7867 -129 7866.5 -126.0Q7866 -123 7866 -121Q7866 -78 7904.0 -52.0Q7942 -26 8015 -26Q8089 -26 8185.5 -70.0Q8282 -114 8413.5 -216.5Q8545 -319 8723.0 -493.0Q8901 -667 9138 -926Q9337 -1143 9464.5 -1264.5Q9592 -1386 9656.5 -1435.0Q9721 -1484 9730 -1484Q9737 -1484 9747.0 -1481.5Q9757 -1479 9757 -1474Q9757 -1468 9742 -1455Q9732 -1446 9717.5 -1433.0Q9703 -1420 9682 -1399Q9656 -1371 9602.5 -1295.5Q9549 -1220 9478.5 -1113.5Q9408 -1007 9328.5 -883.0Q9249 -759 9171.0 -633.0Q9093 -507 9024.5 -394.0Q8956 -281 8906.5 -194.5Q8857 -108 8836 -65Q8945 -191 9033.5 -291.0Q9122 -391 9203.5 -478.5Q9285 -566 9370.5 -653.0Q9456 -740 9558.0 -838.5Q9660 -937 9790 -1060Q9963 -1221 10078.5 -1314.5Q10194 -1408 10263.0 -1447.5Q10332 -1487 10363 -1487Q10373 -1487 10373 -1479Q10373 -1472 10347.0 -1454.0Q10321 -1436 10291 -1410Q10192 -1323 10076.5 -1187.5Q9961 -1052 9840.0 -891.0Q9719 -730 9601.0 -564.0Q9483 -398 9379 -250Q9332 -181 9309.5 -145.5Q9287 -110 9281.0 -94.5Q9275 -79 9275 -67Q9275 -25 9333 -25Q9362 -25 9411.5 -39.5Q9461 -54 9515.0 -81.5Q9569 -109 9609 -148Q9614 -146 9614 -135Q9614 -120 9609 -112Q9566 -76 9510.0 -50.5Q9454 -25 9402.0 -11.5Q9350 2 9316 2Z"></path><path pathLength="1" style="--t: 1.43s" d="M9846 2Q9782 2 9752.5 -33.0Q9723 -68 9723 -129Q9723 -196 9751.5 -272.0Q9780 -348 9846 -423Q9981 -580 10098.5 -632.5Q10216 -685 10319 -685Q10371 -685 10407.0 -663.0Q10443 -641 10443 -603Q10443 -574 10431 -544Q10463 -582 10485.5 -610.5Q10508 -639 10529 -665Q10555 -657 10589 -657Q10603 -657 10627.0 -658.0Q10651 -659 10664 -661L10327 -255Q10263 -179 10235.0 -131.5Q10207 -84 10207 -58Q10207 -26 10238 -26Q10292 -26 10350.0 -57.5Q10408 -89 10464.0 -138.5Q10520 -188 10569.0 -241.5Q10618 -295 10655.5 -340.5Q10693 -386 10713 -408L10733 -391Q10711 -366 10671.0 -319.0Q10631 -272 10579.5 -217.0Q10528 -162 10468.5 -112.0Q10409 -62 10346.5 -30.0Q10284 2 10223 2Q10123 2 10123 -60Q10123 -83 10131.5 -106.5Q10140 -130 10166.0 -167.5Q10192 -205 10244 -268L10234 -272Q10112 -122 10008.5 -60.0Q9905 2 9846 2ZM9850 -28Q9914 -28 10019.0 -102.5Q10124 -177 10271 -351Q10295 -380 10315.5 -405.0Q10336 -430 10355 -452Q10378 -487 10396.5 -525.0Q10415 -563 10415 -594Q10415 -625 10393.0 -639.5Q10371 -654 10345 -654Q10296 -654 10186.5 -583.5Q10077 -513 9946 -358Q9871 -268 9838.0 -198.0Q9805 -128 9805 -80Q9805 -28 9850 -28Z"></path><path pathLength="1" style="--t: 1.55s" d="M10641 2Q10586 2 10558.5 -20.0Q10531 -42 10531 -76Q10531 -103 10538.0 -129.5Q10545 -156 10568.0 -197.0Q10591 -238 10638.0 -307.5Q10685 -377 10765 -490L11023 -853H10944Q10914 -853 10914 -866Q10914 -882 10952 -882H11043L11228 -1142Q11241 -1140 11262.5 -1138.5Q11284 -1137 11324 -1138Q11344 -1138 11367 -1142L11174 -882H11432Q11460 -882 11460 -868Q11460 -853 11435 -853H11152L10888 -497Q10794 -371 10737.0 -290.0Q10680 -209 10650.5 -162.0Q10621 -115 10610.5 -92.0Q10600 -69 10600 -58Q10600 -28 10650 -26Q10719 -27 10792.5 -71.5Q10866 -116 10934.0 -180.5Q11002 -245 11056.0 -307.5Q11110 -370 11140 -406L11162 -389Q11133 -355 11077.0 -291.0Q11021 -227 10948.5 -159.5Q10876 -92 10797.0 -45.0Q10718 2 10641 2Z"></path><path pathLength="1" style="--t: 1.61s" d="M11084 2Q11023 2 10985.5 -20.5Q10948 -43 10948 -81Q10948 -111 10963.0 -150.5Q10978 -190 11020.5 -254.0Q11063 -318 11144.5 -420.5Q11226 -523 11359 -678Q11368 -677 11402.0 -676.0Q11436 -675 11455 -675Q11472 -675 11480.5 -675.5Q11489 -676 11497 -677Q11351 -505 11258.5 -394.0Q11166 -283 11116.0 -217.0Q11066 -151 11047.0 -116.0Q11028 -81 11028 -60Q11028 -34 11056.0 -30.0Q11084 -26 11101 -26Q11155 -26 11219.0 -62.5Q11283 -99 11346.5 -153.5Q11410 -208 11464.5 -264.0Q11519 -320 11554.0 -360.5Q11589 -401 11595 -407L11615 -389Q11604 -377 11567.0 -334.0Q11530 -291 11475.0 -234.5Q11420 -178 11354.5 -124.0Q11289 -70 11219.5 -34.0Q11150 2 11084 2ZM11590 -808Q11578 -808 11578 -818Q11578 -824 11584.0 -827.5Q11590 -831 11603 -840Q11632 -857 11668.0 -886.5Q11704 -916 11728 -954Q11742 -978 11751.0 -1010.0Q11760 -1042 11768 -1098Q11777 -1169 11821 -1169Q11864 -1169 11864 -1114Q11864 -1077 11834.5 -1025.5Q11805 -974 11754.5 -922.0Q11704 -870 11639 -831Q11602 -808 11590 -808Z"></path><path pathLength="1" style="--t: 1.68s" d="M11585 2Q11521 2 11491.5 -33.0Q11462 -68 11462 -129Q11462 -196 11490.5 -272.0Q11519 -348 11585 -423Q11720 -580 11837.5 -632.5Q11955 -685 12058 -685Q12110 -685 12146.0 -663.0Q12182 -641 12182 -603Q12182 -574 12170 -544Q12202 -582 12224.5 -610.5Q12247 -639 12268 -665Q12294 -657 12328 -657Q12342 -657 12366.0 -658.0Q12390 -659 12403 -661L12066 -255Q12002 -179 11974.0 -131.5Q11946 -84 11946 -58Q11946 -26 11977 -26Q12031 -26 12089.0 -57.5Q12147 -89 12203.0 -138.5Q12259 -188 12308.0 -241.5Q12357 -295 12394.5 -340.5Q12432 -386 12452 -408L12472 -391Q12450 -366 12410.0 -319.0Q12370 -272 12318.5 -217.0Q12267 -162 12207.5 -112.0Q12148 -62 12085.5 -30.0Q12023 2 11962 2Q11862 2 11862 -60Q11862 -83 11870.5 -106.5Q11879 -130 11905.0 -167.5Q11931 -205 11983 -268L11973 -272Q11851 -122 11747.5 -60.0Q11644 2 11585 2ZM11589 -28Q11653 -28 11758.0 -102.5Q11863 -177 12010 -351Q12034 -380 12054.5 -405.0Q12075 -430 12094 -452Q12117 -487 12135.5 -525.0Q12154 -563 12154 -594Q12154 -625 12132.0 -639.5Q12110 -654 12084 -654Q12035 -654 11925.5 -583.5Q11816 -513 11685 -358Q11610 -268 11577.0 -198.0Q11544 -128 11544 -80Q11544 -28 11589 -28Z"></path><path pathLength="1" style="--t: 1.79s" d="M12394 23Q12363 23 12314.0 15.0Q12265 7 12226.5 -19.0Q12188 -45 12188 -100Q12188 -150 12218.5 -182.5Q12249 -215 12286.0 -231.0Q12323 -247 12341 -247Q12382 -247 12382 -209Q12381 -193 12359.5 -179.5Q12338 -166 12312 -166Q12300 -166 12288.5 -174.5Q12277 -183 12270 -187Q12259 -176 12236.5 -154.5Q12214 -133 12214 -99Q12214 -61 12244.5 -42.5Q12275 -24 12313.0 -18.5Q12351 -13 12371 -13Q12413 -13 12476.0 -46.5Q12539 -80 12593.5 -159.0Q12648 -238 12664 -374Q12669 -422 12673.5 -507.0Q12678 -592 12705 -670Q12706 -673 12706 -679Q12668 -632 12624.0 -578.0Q12580 -524 12539.5 -474.0Q12499 -424 12470 -389Q12450 -365 12441.0 -358.0Q12432 -351 12433 -351Q12432 -351 12425.5 -350.5Q12419 -350 12415 -357Q12413 -362 12424.5 -376.0Q12436 -390 12449 -406Q12472 -432 12520.0 -489.0Q12568 -546 12621.5 -611.0Q12675 -676 12714 -726Q12720 -756 12732.0 -780.0Q12744 -804 12766 -804Q12806 -804 12806 -771Q12805 -752 12760 -700Q12733 -668 12731.0 -658.5Q12729 -649 12729 -634Q12728 -598 12736.5 -544.5Q12745 -491 12755.0 -432.5Q12765 -374 12768 -321Q12771 -242 12750 -184Q12766 -182 12777 -182Q12809 -182 12850.5 -211.0Q12892 -240 12933.0 -280.0Q12974 -320 13004.5 -356.0Q13035 -392 13045 -406L13067 -389Q13050 -371 13017.0 -333.5Q12984 -296 12942.0 -255.5Q12900 -215 12856.5 -186.5Q12813 -158 12774 -158Q12765 -158 12757.0 -158.5Q12749 -159 12741 -160Q12694 -56 12602.0 -16.5Q12510 23 12394 23Z"></path></svg></h1>
       <p class="lead sube" style="--d: 3.4s">Elegimos compartir la vida juntos, y queremos celebrar este comienzo junto a las personas que forman parte de nuestra historia.</p>
       <p class="fecha-grande sube" style="--d: 3.7s">Viernes 18 de diciembre de 2026</p>
+      <!-- La cuenta regresiva va dentro del texto de la portada: en el celular se ve igual que antes (debajo de la
+           fecha) y en la laptop queda al lado del arco, con los nombres, la frase y la fecha -->
+      <section class="cuenta rv" aria-labelledby="t-cuenta">
+        <img class="rama al-ver" src="rama-1.webp" width="670" height="129" alt="">
+        <h2 id="t-cuenta" class="ojo al-ver">Faltan</h2>
+        <div id="cuenta" class="cuenta-grid al-ver" role="timer">
+          <div class="unidad" style="--i: 0"><span class="num" id="cd-d">–</span><span class="lbl">días</span></div>
+          <div class="unidad" style="--i: 1"><span class="num" id="cd-h">–</span><span class="lbl">horas</span></div>
+          <div class="unidad" style="--i: 2"><span class="num" id="cd-m">–</span><span class="lbl">min</span></div>
+          <div class="unidad" style="--i: 3"><span class="num" id="cd-s">–</span><span class="lbl">seg</span></div>
+        </div>
+        <p id="llego" class="llego" hidden>¡Hoy es el gran día!</p>
+      </section>
     </div>
   </header>
-
-  <section class="cuenta rv" aria-labelledby="t-cuenta">
-    <img class="rama al-ver" src="rama-1.webp" width="670" height="129" alt="">
-    <h2 id="t-cuenta" class="ojo al-ver">Faltan</h2>
-    <div id="cuenta" class="cuenta-grid al-ver" role="timer">
-      <div class="unidad" style="--i: 0"><span class="num" id="cd-d">–</span><span class="lbl">días</span></div>
-      <div class="unidad" style="--i: 1"><span class="num" id="cd-h">–</span><span class="lbl">horas</span></div>
-      <div class="unidad" style="--i: 2"><span class="num" id="cd-m">–</span><span class="lbl">min</span></div>
-      <div class="unidad" style="--i: 3"><span class="num" id="cd-s">–</span><span class="lbl">seg</span></div>
-    </div>
-    <p id="llego" class="llego" hidden>¡Hoy es el gran día!</p>
-  </section>
 
   <section class="lugares" aria-labelledby="t-lugares">
     <img class="rama al-ver" src="rama-2.webp" width="652" height="129" alt="">
     <h2 id="t-lugares" class="titulo al-ver agranda" style="--d: .1s">Dónde y cuándo</h2>
     <p class="ojo lugares-fecha al-ver agranda" style="--d: .25s">Viernes 18 de diciembre</p>
     <div class="lugares-grid">
-      <article class="lugar">
+      <article class="lugar" id="ceremonia">
         <img class="lugar-arte chico plana" src="iglesia.webp" width="560" height="747" alt="Acuarela del Santuario Nacional de María Auxiliadora visto a través del arco de entrada">
         <h3>Ceremonia</h3>
         <p class="detalle">19:00 h</p>
         <p class="sitio">Santuario Nacional de María Auxiliadora<span class="dir">Av. Lezica 6375</span></p>
         <a class="btn-linea chico" href="https://maps.app.goo.gl/kPSYms4JwHcHZjpC7" target="_blank" rel="noopener">Cómo llegar</a>
       </article>
-      <article class="lugar">
+      <article class="lugar" id="fiesta">
         <img class="lugar-arte plana" src="chacra.webp" width="640" height="429" alt="Acuarela de Chacra San José: la casa con techo de tejas, una enredadera violeta y el jardín">
         <h3>Fiesta</h3>
         <p class="detalle">A continuación</p>
@@ -1266,7 +1361,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   // Se muestra en el diagnóstico (?debug) para saber qué versión cargó el teléfono
-  const VERSION = '39';
+  const VERSION = '40';
 
   // ---- Pétalos en acuarela ----
   // Los de fondo están pegados a la pantalla, arriba de todo, y siguen cayendo mientras se baja. Son elementos con
