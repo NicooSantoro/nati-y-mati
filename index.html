@@ -194,8 +194,6 @@ fieldset:focus, main:focus { outline: none; }
 }
 .aviso-cerrar svg { width: 16px; height: 16px; }
 .aviso-cerrar:hover { color: var(--tinta); }
-/* "Ahora no", debajo del botón de WhatsApp */
-.aviso-cuerpo .btn-texto { margin-top: 14px; }
 /* La sugerencia de Chrome se alarga hasta tapar el botón "Abrir invitación" del sobre, que si no quedaba a la vista
    bajo el velo. El sobre y la tarjeta están centrados en la pantalla, así que alcanza con que la tarjeta mida lo que
    la caja del sobre (ancho --w: 0,2w de aire arriba + rótulo + sobre de w/1,42 + nombres + botón ≈ 0,9w + 190px) y
@@ -386,6 +384,8 @@ fieldset:focus, main:focus { outline: none; }
 .hoja .hoja-volver, .hoja .tarjeta, .hoja .cierre { opacity: 0; transform: translateY(28px); transition: opacity .6s ease, transform .9s cubic-bezier(.22, .8, .24, 1); }
 .hoja.arriba .tarjeta, .hoja.arriba .cierre { opacity: 1; transform: none; transition-delay: .5s; }
 .hoja .cierre .rama { margin-top: 52px; }
+/* Mientras la tarjeta despide (dice lo mismo que el pie de la hoja), el pie no se repite debajo */
+.hoja.despidiendo .cierre { display: none; }
 .hoja.arriba .hoja-volver { opacity: 1; transform: none; transition-delay: .75s; }
 .pagina { transition: transform .8s cubic-bezier(.55, 0, .35, 1), opacity .8s ease; }
 body.con-hoja { overflow: hidden; }
@@ -663,6 +663,13 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 .tarjeta.cambiando .nav-pasos { opacity: 0; pointer-events: none; }
 .titulo-paso { padding: 0; margin-bottom: 20px; font-size: 30px; line-height: 1.15; font-weight: 500; color: var(--tinta); }
 .ayuda { font-size: 17px; color: var(--tinta-suave); margin-top: -17px; }
+/* Despedida después de mandar por WhatsApp: la ramita, "Te esperamos...", los nombres escritos con la pluma y la
+   fecha, como al pie de la hoja, y un botón por si hay que cargar la respuesta de otra persona */
+.paso-gracias { gap: 0; align-items: center; text-align: center; }
+.paso-gracias .rama { margin-top: 10px; }
+.paso-gracias .ojo { margin-top: 30px; }
+.paso-gracias .te-esperamos { font-size: clamp(38px, 10.5vw, 52px); }
+.paso-gracias .btn-linea { margin-top: 30px; }
 
 .opciones-grandes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .opcion { position: relative; display: block; cursor: pointer; }
@@ -776,10 +783,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 .ilustradas .chip { grid-column: 1 / -1; }
 .ilustradas .chip > span { width: 100%; justify-content: center; }
 
-.lista-resumen { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 18px; padding: 16px 18px; background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; }
-.lista-resumen dt { font-family: var(--f-sans); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--tinta-suave); padding-top: 4px; }
-.lista-resumen dd { font-size: 19px; overflow-wrap: anywhere; }
-.acciones-resumen { display: flex; margin-top: 3px; }
+.acciones-envio { display: flex; margin-top: 3px; }
 /* El botón para mandar la respuesta ocupa todo el ancho y cada tanto se mueve para llamar la atención */
 .btn-wa { width: 100%; min-height: 56px; padding: 10px 22px; gap: 10px; font-size: 15px; line-height: 1.3; text-align: center; animation: llamar 3.2s ease-in-out 1s infinite; }
 .btn-wa .icono-wa { width: 22px; height: 22px; flex: none; }
@@ -891,8 +895,6 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 
 @media (max-width: 460px) {
   .titulo-paso { font-size: 27px; }
-  .lista-resumen { grid-template-columns: minmax(0, 1fr); gap: 2px; }
-  .lista-resumen dd + dt { margin-top: 8px; }
 }
 /* Con el teléfono en modo oscuro, los mismos colores: el navegador de Samsung solo deja en paz a las páginas que
    contemplan ese modo, y esta regla es nuestro "tema oscuro"... con los colores de siempre. Ojo: no declarar acá
@@ -922,23 +924,6 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
       <p>Este navegador puede mostrar la invitación con los colores cambiados.</p>
       <button type="button" class="btn" id="abrir-en-chrome">Abrir en Chrome</button>
       <p class="aviso-pista" id="aviso-pista" hidden></p>
-    </div>
-  </div>
-</div>
-
-<!-- Al confirmar, un momento después del resumen, esta tarjeta pide mandar la respuesta por WhatsApp: con el botón
-     solo en el resumen, muchos cerraban la página sin tocarlo. La cruz, "Ahora no" o tocar afuera la cierran -->
-<div class="aviso" id="aviso-wa" role="dialog" aria-modal="true" aria-labelledby="t-aviso-wa" hidden>
-  <div class="aviso-caja">
-    <button type="button" class="aviso-cerrar" id="cerrar-aviso-wa" aria-label="Cerrar">
-      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path></svg>
-    </button>
-    <div class="aviso-cuerpo">
-      <p class="ojo">Falta un paso</p>
-      <h2 id="t-aviso-wa" class="aviso-titulo">Mandales tu respuesta</h2>
-      <p>Para que les llegue a Nati y Mati, compartila por WhatsApp. El mensaje ya está escrito: solo hay que enviarlo.</p>
-      <a class="btn btn-wa" id="enviar-wa-aviso" href="https://wa.me/" target="_blank" rel="noopener"><svg class="icono-wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path></svg>Enviar por WhatsApp</a>
-      <button type="button" class="btn-texto" id="ahora-no-wa">Ahora no</button>
     </div>
   </div>
 </div>
@@ -1227,12 +1212,23 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
           </div>
         </fieldset>
 
-        <fieldset class="paso" id="p-resumen" tabindex="-1" hidden>
-          <legend class="titulo-paso" id="resumen-titulo">¡Te esperamos!</legend>
-          <dl class="lista-resumen" id="lista-resumen"></dl>
-          <div class="acciones-resumen">
-            <a class="btn btn-wa" id="enviar-wa" href="https://wa.me/" target="_blank" rel="noopener"><svg class="icono-wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path></svg>Compartí tu respuesta con los novios por WhatsApp</a>
+        <!-- Al confirmar: los pétalos, y lo único que queda por hacer es mandar la respuesta por WhatsApp -->
+        <fieldset class="paso" id="p-enviar" tabindex="-1" hidden>
+          <legend class="titulo-paso" id="enviar-titulo">¡Te esperamos!</legend>
+          <p class="ayuda">Falta un paso: para que tu respuesta les llegue a Nati y Mati, mandásela por WhatsApp. El mensaje ya está escrito, solo hay que enviarlo.</p>
+          <div class="acciones-envio">
+            <a class="btn btn-wa" id="enviar-wa" href="https://wa.me/" target="_blank" rel="noopener"><svg class="icono-wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path></svg>Enviar por WhatsApp</a>
           </div>
+        </fieldset>
+
+        <!-- Después de mandar por WhatsApp: la despedida del pie de la hoja, en la tarjeta (los nombres se copian de
+             ahí para escribirse con la misma pluma), y un botón por si hay que cargar la respuesta de otra persona -->
+        <fieldset class="paso paso-gracias" id="p-gracias" tabindex="-1" hidden>
+          <img class="rama" src="rama-5.webp" width="652" height="129" alt="">
+          <p class="ojo" id="gracias-ojo">Te esperamos para celebrar juntos</p>
+          <p class="te-esperamos" id="gracias-nombres"><span class="solo-lectores">Natalia &amp; Matías</span></p>
+          <p class="firma">18 · 12 · 2026</p>
+          <button type="button" class="btn-linea" id="otra-respuesta">Confirmar a otra persona</button>
         </fieldset>
 
         <div class="nav-pasos">
@@ -1270,7 +1266,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   // Se muestra en el diagnóstico (?debug) para saber qué versión cargó el teléfono
-  const VERSION = '31';
+  const VERSION = '32';
 
   // ---- Pétalos en acuarela ----
   // Los de fondo están pegados a la pantalla, arriba de todo, y siguen cayendo mientras se baja. Son elementos con
@@ -1723,8 +1719,10 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 
   // ---- Confirmación paso a paso ----
   const form = $('#rsvp');
-  const pasos = { asistencia: $('#p-asistencia'), datos: $('#p-datos'), bebidas: $('#p-bebidas'), comida: $('#p-comida'), extras: $('#p-extras'), resumen: $('#p-resumen') };
-  const RUTA = { si: ['asistencia', 'datos', 'bebidas', 'comida', 'extras', 'resumen'], no: ['asistencia', 'datos', 'extras', 'resumen'] };
+  // La ruta termina en "enviar" (mandar por WhatsApp); "gracias" es la despedida, a la que se llega al mandar
+  const pasos = { asistencia: $('#p-asistencia'), datos: $('#p-datos'), bebidas: $('#p-bebidas'), comida: $('#p-comida'), extras: $('#p-extras'), enviar: $('#p-enviar'), gracias: $('#p-gracias') };
+  const RUTA = { si: ['asistencia', 'datos', 'bebidas', 'comida', 'extras', 'enviar'], no: ['asistencia', 'datos', 'extras', 'enviar'] };
+  function esFinal(paso) { return paso === 'enviar' || paso === 'gracias'; }
   const CLAVE = 'invitacion-natalia-matias';
   let estado = { id: '', asiste: null, nombre: '', bebidas: [], comida: [], comidaOtra: '', cancion: '', mensaje: '' };
   let actual = 'asistencia';
@@ -1798,16 +1796,6 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     if (estado.comida.indexOf('Otra') !== -1 && estado.comidaOtra.trim()) lista.push(estado.comidaOtra.trim());
     return lista.length ? lista.join(', ') : 'Sin restricciones';
   }
-  function filas() {
-    const f = [['Respuesta', estado.asiste === 'no' ? 'No voy a poder' : '¡Sí, voy!'], ['Nombre', estado.nombre.trim()]];
-    if (estado.asiste !== 'no') {
-      f.push(['Para tomar', estado.bebidas.length ? estado.bebidas.join(', ') : 'Ninguna en particular']);
-      f.push(['Comida', comidaTexto()]);
-      if (estado.cancion.trim()) f.push(['Canción', estado.cancion.trim()]);
-    }
-    if (estado.mensaje.trim()) f.push(['Mensaje', estado.mensaje.trim()]);
-    return f;
-  }
   function mensajeWa() {
     const n = estado.nombre.trim();
     if (estado.asiste === 'no') {
@@ -1822,18 +1810,10 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
       estado.mensaje.trim() ? 'Mensaje: ' + estado.mensaje.trim() : ''
     ].filter(Boolean).join('\n');
   }
-  function armarResumen() {
+  function armarEnvio() {
     const nombre = primerNombre();
-    $('#resumen-titulo').textContent = (estado.asiste === 'no' ? '¡Gracias por avisar' : '¡Te esperamos') + (nombre ? ', ' + nombre : '') + '!';
-    const dl = $('#lista-resumen');
-    dl.textContent = '';
-    filas().forEach(function (par) {
-      const dt = document.createElement('dt'); dt.textContent = par[0];
-      const dd = document.createElement('dd'); dd.textContent = par[1];
-      dl.appendChild(dt); dl.appendChild(dd);
-    });
-    const texto = mensajeWa();
-    $('#enviar-wa').href = 'https://wa.me/' + BODA.whatsapp + '?text=' + encodeURIComponent(texto);
+    $('#enviar-titulo').textContent = (estado.asiste === 'no' ? '¡Gracias por avisar' : '¡Te esperamos') + (nombre ? ', ' + nombre : '') + '!';
+    $('#enviar-wa').href = 'https://wa.me/' + BODA.whatsapp + '?text=' + encodeURIComponent(mensajeWa());
   }
 
   // Al cambiar de paso todo va de a uno: el paso que estaba se desvanece, la hoja sube despacio hasta la tarjeta
@@ -1847,8 +1827,8 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     const i = Math.max(0, r.indexOf(paso));
     const total = r.length - 1;
     // La barra avanza enseguida, mientras la hoja sube
-    $('#progreso-texto').textContent = paso === 'resumen' ? '¡Listo!' : 'Paso ' + (i + 1) + ' de ' + total;
-    $('#progreso-barra').style.width = (paso === 'resumen' ? 100 : (i / total) * 100) + '%';
+    $('#progreso-texto').textContent = esFinal(paso) ? '¡Listo!' : 'Paso ' + (i + 1) + ' de ' + total;
+    $('#progreso-barra').style.width = (esFinal(paso) ? 100 : (i / total) * 100) + '%';
     guardar();
     const este = ++turno;
     // Si la tarjeta quedó arriba de la pantalla, la hoja vuelve al principio (con el sello a la vista)
@@ -1876,27 +1856,29 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     const el = pasos[paso];
     const r = ruta();
     const i = Math.max(0, r.indexOf(paso));
-    $('#atras').hidden = i === 0 || paso === 'resumen';
-    $('#siguiente').hidden = paso === 'asistencia' || paso === 'resumen';
-    // En el último paso antes del resumen el botón confirma
-    $('#siguiente').textContent = r[i + 1] === 'resumen' ? 'Confirmar' : 'Siguiente';
-    if (paso === 'resumen') armarResumen();
-    if (paso === 'resumen' && dir) anotarEnPlanilla();
+    $('#atras').hidden = i === 0 || esFinal(paso);
+    $('#siguiente').hidden = paso === 'asistencia' || esFinal(paso);
+    // En el último paso antes de mandar, el botón confirma
+    $('#siguiente').textContent = r[i + 1] === 'enviar' ? 'Confirmar' : 'Siguiente';
+    if (paso === 'enviar') armarEnvio();
+    if (paso === 'enviar' && dir) anotarEnPlanilla();
+    if (paso === 'gracias') armarDespedida();
+    hoja.classList.toggle('despidiendo', paso === 'gracias');
     // Si la tarjeta cambia de alto, el paso nuevo espera a que se haya acomodado casi del todo
     const espera = animado && acomodarAlto(alto) ? Math.round(AJUSTE_MS * 0.6) : 0;
     el.style.setProperty('--espera', espera + 'ms');
     if (dir && !reducir) { void el.offsetWidth; el.classList.add(dir > 0 ? 'entra-adelante' : 'entra-atras'); }
     setTimeout(function () { cambiando = false; form.classList.remove('cambiando'); }, espera);
+    // La despedida se escribe cuando el paso ya llegó (si la página se recarga en ese paso, enseguida)
+    if (paso === 'gracias') setTimeout(escribirDespedida, dir ? espera + 150 : 0);
     if (!dir) return;
     try { el.focus({ preventScroll: true }); } catch (e) {}
-    if (paso === 'resumen' && estado.asiste === 'si') {
+    if (paso === 'enviar' && estado.asiste === 'si') {
       setTimeout(function () {
-        const t = $('#resumen-titulo').getBoundingClientRect();
+        const t = $('#enviar-titulo').getBoundingClientRect();
         petalos.rafaga(t.left + t.width / 2, t.top + t.height / 2);
       }, espera);
     }
-    // Con el resumen ya a la vista (y los pétalos cayendo), llega el pedido de mandar la respuesta por WhatsApp
-    if (paso === 'resumen') setTimeout(mostrarAvisoWa, espera + 1500);
   }
   // La tarjeta pasa de a poco del alto del paso anterior al del nuevo, en vez de estirarse o encogerse de golpe
   function acomodarAlto(desde) {
@@ -1982,33 +1964,28 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     $('#error-bebidas').hidden = true;
     try { localStorage.removeItem(CLAVE); } catch (e) {}
     aplicarModo();
+    prepararDespedida();
     ir('asistencia', -1);
   }
-  // Después de mandar por WhatsApp se vuelve a la invitación, y la tarjeta se vacía cuando ya no se ve
-  function alMandarPorWa() {
-    setTimeout(function () { bajarHoja(); setTimeout(vaciarTarjeta, reducir ? 0 : 900); }, 800);
-  }
-  $('#enviar-wa').addEventListener('click', alMandarPorWa);
+  // Después de mandar por WhatsApp la tarjeta pasa a la despedida (la respuesta queda guardada por si se recarga)
+  $('#enviar-wa').addEventListener('click', function () {
+    setTimeout(function () { ir('gracias', 1); }, 800);
+  });
 
-  // El pedido de mandar la respuesta por WhatsApp (#aviso-wa): aparece un momento después de llegar al resumen,
-  // con el mismo mensaje armado que el botón del resumen. Cerrarlo deja el resumen como estaba, con su botón
-  const avisoWa = $('#aviso-wa');
-  function mostrarAvisoWa() {
-    if (actual !== 'resumen') return;
-    $('#enviar-wa-aviso').href = $('#enviar-wa').href;
-    avisoWa.hidden = false;
-    try { $('#enviar-wa-aviso').focus({ preventScroll: true }); } catch (e) {}
+  // ---- Despedida ----
+  // La ramita se agranda y los nombres se escriben con la misma pluma que al pie de la hoja (se copia ese dibujo).
+  // "Confirmar a otra persona" vacía la tarjeta y vuelve al primer paso
+  const despedida = [$('.paso-gracias .rama'), $('#gracias-nombres')];
+  $('#gracias-nombres').appendChild($('.hoja .cierre .nombres-svg').cloneNode(true));
+  function prepararDespedida() {
+    despedida.forEach(function (el) { el.classList.remove('visto'); if (!reducir) el.classList.add('espera'); });
   }
-  function cerrarAvisoWa() {
-    if (avisoWa.hidden) return;
-    avisoWa.hidden = true;
-    try { pasos.resumen.focus({ preventScroll: true }); } catch (e) {}
+  function armarDespedida() {
+    $('#gracias-ojo').textContent = estado.asiste === 'no' ? 'Gracias por avisarnos' : 'Te esperamos para celebrar juntos';
   }
-  $('#cerrar-aviso-wa').addEventListener('click', cerrarAvisoWa);
-  $('#ahora-no-wa').addEventListener('click', cerrarAvisoWa);
-  avisoWa.addEventListener('click', function (e) { if (e.target === avisoWa) cerrarAvisoWa(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') cerrarAvisoWa(); });
-  $('#enviar-wa-aviso').addEventListener('click', function () { cerrarAvisoWa(); alMandarPorWa(); });
+  function escribirDespedida() { despedida.forEach(function (el) { el.classList.add('visto'); }); }
+  prepararDespedida();
+  $('#otra-respuesta').addEventListener('click', function () { if (!cambiando) vaciarTarjeta(); });
   $('#atras').addEventListener('click', function () {
     if (cambiando) return;
     const r = ruta(); const i = r.indexOf(actual);
