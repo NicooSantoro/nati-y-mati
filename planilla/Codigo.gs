@@ -61,8 +61,30 @@ function obtenerHoja() {
     hoja.appendRow(COLUMNAS);
     hoja.setFrozenRows(1);
     hoja.getRange(1, 1, 1, COLUMNAS.length).setFontWeight('bold');
+    prepararColores(hoja);
   }
   return hoja;
+}
+
+// Cada fila se pinta según la columna "Asiste": verde si va, rojo si no va. Es formato condicional de la hoja,
+// así que vale para las filas que ya están y para las que lleguen, y sigue a la celda si alguien la edita a mano.
+// Se puede ejecutar desde el editor (Ejecutar ▶ con esta función elegida) para aplicarlo a una hoja ya creada.
+const VERDE = '#D9EAD3', ROJO = '#F4CCCC';
+function prepararColores(hoja) {
+  hoja = hoja || obtenerHoja();
+  const filas = hoja.getRange('A2:' + columnaLetra(COLUMNAS.length) + hoja.getMaxRows());
+  const reglas = [
+    SpreadsheetApp.newConditionalFormatRule().whenFormulaSatisfied('=$C2="Sí"').setBackground(VERDE).setRanges([filas]).build(),
+    SpreadsheetApp.newConditionalFormatRule().whenFormulaSatisfied('=$C2="No va"').setBackground(ROJO).setRanges([filas]).build()
+  ];
+  // Reemplaza las reglas anteriores de esta hoja para no acumularlas
+  hoja.setConditionalFormatRules(reglas);
+}
+
+function columnaLetra(n) {
+  let letra = '';
+  while (n > 0) { const resto = (n - 1) % 26; letra = String.fromCharCode(65 + resto) + letra; n = Math.floor((n - 1) / 26); }
+  return letra;
 }
 
 function buscarFila(hoja, id) {

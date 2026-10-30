@@ -28,6 +28,8 @@ pueden borrar. Los pasos de abajo quedan por si hay que rehacerla en otra cuenta
 
 Detalles que conviene saber:
 
+- Las filas se pintan solas según "Asiste": verde si va, rojo si no va (formato condicional de la hoja, puesto por
+  `prepararColores`; si alguna vez se borra, volver a ejecutar esa función desde el editor).
 - Si después cambiás el código, hay que volver a **Implementar → Administrar implementaciones → editar (lápiz) →
   Versión: Nueva → Implementar**. Así la dirección sigue siendo la misma. Una "Nueva implementación" genera otra
   dirección distinta y habría que cambiarla en `index.html`.
