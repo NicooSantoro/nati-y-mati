@@ -616,7 +616,9 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 .sitio { margin-top: -3px; display: flex; flex-direction: column; gap: 4px; font-size: clamp(17px, 4.6vw, 20px); font-style: italic; line-height: 1.2; text-wrap: balance; }
 .dir { font-family: var(--f-sans); font-size: 13px; font-style: normal; letter-spacing: .02em; color: var(--tinta-suave); }
 .lugar .btn-linea { align-self: start; margin-top: 20px; }
-.dress { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 22px; }
+/* Vestimenta: el rótulo chico y "Formal" en la misma letra de la fecha de la portada, entre dos filetes finos */
+.dress { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 44px; padding: 14px 40px 12px; border-top: 1px solid var(--linea); border-bottom: 1px solid var(--linea); }
+.dress-valor { font-size: 22px; font-weight: 500; letter-spacing: .14em; padding-left: .14em; text-transform: uppercase; color: var(--tinta); }
 
 /* Confirmación */
 .confirmar { display: flex; flex-direction: column; align-items: center; text-align: center; }
@@ -1172,6 +1174,11 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
         <a class="btn-linea chico" href="https://maps.app.goo.gl/ye5DgcywNNtm7GA38" target="_blank" rel="noopener">Cómo llegar</a>
       </article>
     </div>
+    <!-- Debajo de la ceremonia y la fiesta, cómo venir vestidos -->
+    <div class="dress">
+      <span class="ojo">Vestimenta</span>
+      <span class="dress-valor">Formal</span>
+    </div>
     <!-- Los regalos van después de los lugares; debajo, el botón de confirmar, y la acuarela del salón cierra esta parte -->
     <section class="regalos rv" aria-labelledby="t-regalos">
       <h2 id="t-regalos" class="titulo">Regalos</h2>
@@ -1366,7 +1373,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   // Se muestra en el diagnóstico (?debug) para saber qué versión cargó el teléfono
-  const VERSION = '40';
+  const VERSION = '41';
 
   // ---- Pétalos en acuarela ----
   // Los de fondo están pegados a la pantalla, arriba de todo, y siguen cayendo mientras se baja. Son elementos con
