@@ -591,6 +591,12 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 }
 /* Los novios aparecen parados en el camino, bajo el arco */
 .arte-marco { position: relative; width: 100%; max-width: 430px; }
+/* En el celular (y pantallas angostas), la acuarela queda a la misma distancia del borde de arriba que de los
+   costados: el costado visible es el margen libre más la mitad del difuminado lateral (15% del ancho), y arriba se
+   descuenta la mitad del difuminado de arriba (3% del alto, ≈4% del ancho) */
+@media (max-width: 1023px) {
+  .arte-marco { --a: min(100vw, 430px); margin-top: calc((100vw - var(--a)) / 2 + var(--a) * .054); }
+}
 .novios {
   position: absolute;
   left: 34.7%;
@@ -1376,7 +1382,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   // Se muestra en el diagnóstico (?debug) para saber qué versión cargó el teléfono
-  const VERSION = '42';
+  const VERSION = '43';
 
   // ---- Pétalos en acuarela ----
   // Los de fondo están pegados a la pantalla, arriba de todo, y siguen cayendo mientras se baja. Son elementos con
