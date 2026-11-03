@@ -830,7 +830,10 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
    desde su centro (la aceituna): la rama mide 670 × 129, así que su alto es 0,1925 del ancho y el centro, la mitad.
    Se funden con el papel (multiply) como el resto de las acuarelas */
 .cuenta-marco { position: relative; margin-top: 6px; max-width: 100%; box-sizing: border-box; }
-.cuenta-marco .cuenta-banco { margin-top: 0; max-width: 100%; box-sizing: border-box; padding-left: 50px; padding-right: 22px; }
+/* El contenido va centrado en el rectángulo (el mismo aire a cada lado), aunque la rama de la izquierda lo roce */
+.cuenta-marco .cuenta-banco { margin-top: 0; max-width: 100%; box-sizing: border-box; padding-left: 36px; padding-right: 36px; }
+/* El espaciado entre letras deja aire de más al final: el mismo aire al principio deja el número bien centrado */
+.cuenta-numero { padding-left: .12em; }
 .rama-tarjeta {
   position: absolute;
   width: var(--w);
@@ -1373,7 +1376,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   // Se muestra en el diagnóstico (?debug) para saber qué versión cargó el teléfono
-  const VERSION = '41';
+  const VERSION = '42';
 
   // ---- Pétalos en acuarela ----
   // Los de fondo están pegados a la pantalla, arriba de todo, y siguen cayendo mientras se baja. Son elementos con
